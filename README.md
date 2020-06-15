@@ -25,6 +25,11 @@ Otherwise refer to RabbitMQ documentation for installing and configuring an inst
 ## Celery
 Comunnication and task scheduling is handled by Celery. Celery application is defined and configured in scheduler module.
 Define tasks in module.tasks otherwise update imports config in scheduler.celeryconfig
+
+Documentation:
+
+***https://docs.celeryproject.org/en/stable/getting-started/next-steps.html#using-celery-in-your-application***
+
 ### Staring workers
 Starting regular queue worker:
 ```
@@ -38,10 +43,10 @@ Test your queues by running modifing and running `python cli.py`.
 
 ## Packages
 
-backend - node.js+koa server
-frontend - create-react-app frontend SPA
-scheduler - celery configuration and scheduling tasks
-crawler - website crawling code and celery task definitions (LAD, SSD)
-nlpengine - processing of crawled files and input to DB
-translator - translating db records and documents
-pdfparser - parsing and filtering documents
+- backend - node.js+koa server
+- frontend - create-react-app frontend SPA
+- scheduler - celery configuration and scheduling tasks
+- crawler - website crawling code and celery task definitions (LAD, SSD)
+- nlpengine - processing of crawled files and input to DB
+- translator - translating db records and documents
+- pdfparser - parsing and filtering documents

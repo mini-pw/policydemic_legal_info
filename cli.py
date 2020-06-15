@@ -1,5 +1,5 @@
 # Helper file for testing queues
-from crawler.tasks import hello_world
+from pdfparser.tasks import pdfparser
 
-hello_world.delay()
+pdfparser.delay()
 print("Done!")

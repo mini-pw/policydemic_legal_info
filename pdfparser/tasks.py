@@ -2,5 +2,5 @@ from scheduler.celery import app
 
 
 @app.task
-def hello_world():
+def pdfparser():
     print("Hello queue world!")
