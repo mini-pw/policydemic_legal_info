@@ -1,0 +1,55 @@
+{
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0
+    },
+    "mappings": {
+        "properties": {
+            "web_page": {
+                "type": "keyword"
+            },
+            "document_type": {
+                "type": "keyword"
+            },
+            "pdf_path": {
+                "type": "keyword",
+                "index": false
+            },
+            "scrap_date": {
+                "type": "date",
+                "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "info_date": {
+                "type": "date",
+                "format": "yyyy-MM-dd"
+            },
+            "country": {
+                "type": "keyword"
+            },
+            "language": {
+                "type": "keyword"
+            },
+            "translation_type": {
+                "type": "keyword"
+            },
+            "text_parsing_type": {
+                "type": "keyword"
+            },
+            "keywords": {
+                "type": "keyword"
+            },
+            "original_text": {
+                "type": "text"
+            },
+            "translated_text": {
+                "type": "text"
+            },
+            "organization": {
+                "type": "keyword"
+            },
+            "section": {
+                "type": "keyword"
+            }
+        }
+    }
+}
