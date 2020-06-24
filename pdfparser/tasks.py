@@ -1,9 +1,10 @@
+from PyPDF2 import PdfFileReader
+
 from scheduler.celery import app
 
 import pytesseract
 from PIL import Image
 from wand.image import Image as wi
-=======
 
 # --- required for complex criterion --- #
 import flair
