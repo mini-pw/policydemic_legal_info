@@ -1,18 +1,19 @@
 
 import React from 'react';
+import Typography from '@material-ui/core/Typography';
 
 export default class CrawlerConfigTabComponent extends React.Component {
     render() {
         return (<div>
-            <h1>
+            <Typography variant="h3">
                 Crawler
-            </h1>
-            <h1>
+            </Typography>
+            <Typography variant="h4">
                 Schedule
-            </h1>
-            <h1>
+            </Typography>
+            <Typography variant="h4">
                 Search criteria
-            </h1>
+            </Typography>
         </div>)
     }
 }

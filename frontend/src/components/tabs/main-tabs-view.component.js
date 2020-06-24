@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import SwipeableViews from 'react-swipeable-views';
 
 import LadTabComponent from './lad-tab.component.js';
 import SsdTabComponent from './ssd-tab.component.js';
@@ -46,21 +47,30 @@ function a11yProps(index) {
   };
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
+
 
 export default function MainTabs() {
+
+  const useStyles = makeStyles((theme) => ({
+    root: {
+      flexGrow: 1,
+      backgroundColor: theme.palette.background.paper,
+    },
+  }));
+
   const classes = useStyles();
+  const theme = useTheme();
+
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
+  const handleChangeIndex = (index) => {
+    setValue(index);
+  };
+ 
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -70,15 +80,21 @@ export default function MainTabs() {
           <Tab label="CRAWLER CONFIG" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
-        <LadTabComponent/>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <SsdTabComponent/>
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <CrawlerConfigComponent/>
-      </TabPanel>
+      <SwipeableViews
+        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+        index={value}
+        onChangeIndex={handleChangeIndex}
+      >
+        <TabPanel value={value} index={0}>
+          <LadTabComponent />
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <SsdTabComponent />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <CrawlerConfigComponent />
+        </TabPanel>
+      </SwipeableViews>
     </div>
   );
 }
