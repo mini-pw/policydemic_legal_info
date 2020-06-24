@@ -3,6 +3,9 @@
 
 import requests 
 from pathlib import Path
+import CGRT
+import csv
+import codecs
 
 # @app.task
 # def scan_website(link):
@@ -52,3 +55,27 @@ def downloadPdf(url, directory = 'tmp', filename = 'document.pdf', chunkSize = 1
             # writing one chunk at a time to pdf file 
             if chunk: 
                 pdf.write(chunk)
+
+
+
+'''
+function takes records from Coronavirus Government Response Tracker csv file
+with specified country and date range 
+date format is YYYYMMDD , for example "20200624"
+'''
+@app.task
+def downloadCgrtData(country, dateFrom, dateTo):
+    #list of records from csv file
+    records = []
+    #read the csv file from url
+    r = requests.get(CGRT.URL, stream=True)
+    reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'), delimiter=',')
+    for row in reader:
+        #convert row from csv to class record
+        record = CGRT.createCgrtRecord(row, country, dateFrom, dateTo)
+        if record is None:
+            continue
+        records.append(record)
+    
+    #convert downloaded records to DB INPUT
+    return CGRT.convertToDatabaseRecords(records)
