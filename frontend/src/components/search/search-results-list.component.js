@@ -20,10 +20,10 @@ export default class SearchResultsListComponent extends React.Component {
             <Box
                 textAlign="left"
             >                
-
-                <SearchTableComponent tableTitle={this.props.headerCaption}/>
-
-                
+                <SearchTableComponent 
+                    tableTitle={this.props.headerCaption}
+                    onAddNewItemClick={this.props.onAddNewItemClick}
+                />
             </Box>
         )
     }

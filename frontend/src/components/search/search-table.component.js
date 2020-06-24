@@ -318,7 +318,7 @@ export default function EnhancedTable(props) {
     };
 
     const addNewItemButtonClicked = (event) => {
-        alert("add new item");
+        props.onAddNewItemClick()
     }
 
     const downloadSelectedButtonClicked = (event) => {
