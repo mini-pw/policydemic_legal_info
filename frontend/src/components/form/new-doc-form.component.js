@@ -3,33 +3,18 @@ import 'date-fns';
 
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { useForm, Controller } from "react-hook-form";
 import Api from "../../common/api";
 
+import AsyncAutocomplete from "./async-autocomplete.component";
 import UploadPdfComponent from './upload-pdf.component';
 
 
 export default function NewDocFormComponent({ type, onSuccessfulSend }) {
     const pdfUpload = type === "LAD";
-    const webPages = [
-        'google.com',
-        'bing.com'
-    ];
-
-    const languages = [
-        'Polish',
-        'English'
-    ];
-
-    const countries = [
-        'Poland',
-        'USA'
-    ]
-
     const [infoDate, setInfoDate] = React.useState(new Date());
     const [scrapDate, setScrapDate] = React.useState(new Date());
 
@@ -100,9 +85,9 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
 
                     <Grid container item xs={12} spacing={8} justify="space-around">
                         <Grid item md={4}>
-                            <Autocomplete
+                            <AsyncAutocomplete
                                 name="keywords"
-                                options={countries}
+                                collectionName="keywords"
                                 style={{ width: 300 }}
                                 openOnFocus
                                 fullWidth
@@ -112,7 +97,7 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                                         {...params}
                                         label="Keywords" margin="normal" />}
 
-                                onChange={(_, val) => setValue("keywords", val)}
+                                onChange={(_, opts) => setValue("keywords", opts.map(o => o.value).join(','))}
                             />
                         </Grid>
                         <Grid item md={4}>
@@ -151,12 +136,12 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
 
                     <Grid container item xs={12} spacing={8} justify="space-around">
                         <Grid item md={4}>
-                            <Autocomplete
+                            <AsyncAutocomplete
                                 name="country"
-                                options={countries}
+                                collectionName="countries"
                                 style={{ width: 300 }}
                                 openOnFocus
-                                onChange={(_, val) => setValue("country", val)}
+                                onChange={(_, opt) => setValue("country", opt.value)}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -165,13 +150,13 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                             />
                         </Grid>
                         <Grid item md={4}>
-                            <Autocomplete
+                            <AsyncAutocomplete
                                 name="language"
+                                collectionName="languages"
                                 inputRef={register}
-                                options={languages}
                                 style={{ width: 300 }}
                                 openOnFocus
-                                onChange={(_, val) => setValue("language", val)}
+                                onChange={(_, opt) => setValue("language", opt.value)}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -180,13 +165,13 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                             />
                         </Grid>
                         <Grid item md={4}>
-                            <Autocomplete
+                            <AsyncAutocomplete
                                 name="translationType"
+                                collectionName="translationTypes"
                                 inputRef={register}
-                                options={countries}
                                 style={{ width: 300 }}
                                 openOnFocus
-                                onChange={(_, val) => setValue("translationType", val)}
+                                onChange={(_, opt) => setValue("translationType", opt.value)}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
