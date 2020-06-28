@@ -7,15 +7,35 @@ import NewDocDialogComponent from '../form/new-doc-dialog.component.js';
 import NewDocFormComponent from '../form/new-doc-form.component.js';
 import { useFormDialog } from '../../common/hooks/form-dialog-hook';
 
+import Api from '../../common/api.js';
+
 export default function LadTabComponent() {
     const [openDialog, handleOpenDialog, handleCloseDialog] = useFormDialog();
 
+    const [searchResults, setSearchResults] = React.useState([]);
+
+    const handleSearch = (formData) => {
+
+        Api.getSearchResults("SSD", formData).then((resp) => 
+        {
+            setSearchResults(resp);
+        });
+    }
+
+    const handleReset = () => {
+        setSearchResults([]);
+    }
+
+    const handleOnDelete = (selected) => {
+        alert(selected.join(','));
+    }
+
     return (<Container>
-        <SearchFormComponent />
+        <SearchFormComponent onSearch={handleSearch} onReset={handleReset}/>
         <NewDocDialogComponent open={openDialog} onClose={handleCloseDialog}>
             <NewDocFormComponent type="LAD" onSuccessfulSend={handleCloseDialog}/>
         </NewDocDialogComponent>
-        <SearchResultsListComponent headerCaption="LAD" onAddNewItemClick={handleOpenDialog} />
+        <SearchResultsListComponent headerCaption="LAD" onAddNewItemClick={handleOpenDialog} searchResultsList={searchResults} onDelete={handleOnDelete}/>
     </Container>)
 
 } 

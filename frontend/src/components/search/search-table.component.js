@@ -24,24 +24,7 @@ import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-
-
-function createDataForRow(id, source, infoDate, language, keywords, country) {
-    return {
-        id: id,
-        source: source,
-        infoDate: infoDate,
-        language: language,
-        keywords: keywords,
-        country: country
-    };
-}
-
-const rows = [
-    createDataForRow(1, "International Labour Organization", new Date(1995, 4, 4), "english", "cinemas", "Canada"),
-    createDataForRow(2, "Coronavirus Government Response Tracker", new Date(1998, 0, 14), "french", "pubs", "Italy"),
-    createDataForRow(3, "Coronavirus Government Response Tracker", new Date(1990, 3, 24), "french", "pubs", "Italy")
-];
+import DeleteConfirmationDialogComponent from './delete-dialog.component.js';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -255,14 +238,20 @@ function onMoreClick(event, objId) {
 
 export default function EnhancedTable(props) {
 
-    const { tableTitle } = props;
+    const { tableTitle, rows, onDelete } = props;
 
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
+    const [selected, setSelected] = React.useState([], );
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5); 
+    
+    const [deleteDialogVisible, setDeleteDialogVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        setSelected([]);
+    }, [props.rows]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -312,7 +301,6 @@ export default function EnhancedTable(props) {
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-
     const uploadJsonButtonClicked = (event) => {
         alert("upload json");
     };
@@ -325,11 +313,15 @@ export default function EnhancedTable(props) {
         alert("download items: " + selected);
     };
 
-    const deleteButtonClicked = (event) => {
-        alert("delete items: " + selected);
-    };
-
     return (
+        <div>
+        <DeleteConfirmationDialogComponent
+            dialogVisible={deleteDialogVisible}
+            onDeleteExecute={() => {
+                onDelete(selected);
+                setDeleteDialogVisible(false);}}
+            onDeleteCancelExecute={() => setDeleteDialogVisible(false)}
+        />
         <Container className={classes.root}>
             <Paper className={classes.paper}>
                 <EnhancedTableToolbar
@@ -338,7 +330,7 @@ export default function EnhancedTable(props) {
                     onUploadJSONClick={uploadJsonButtonClicked}
                     onAddNewItemClick={addNewItemButtonClicked}
                     onDownloadSelectedClick={downloadSelectedButtonClicked}
-                    onDeleteClick={deleteButtonClicked}
+                    onDeleteClick={() => setDeleteDialogVisible(true)}
                 />
                 <TableContainer>
                     <Table
@@ -415,5 +407,6 @@ export default function EnhancedTable(props) {
                 />
             </Paper>
         </Container>
+        </div>
     );
 }
