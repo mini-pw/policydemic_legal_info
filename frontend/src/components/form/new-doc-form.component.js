@@ -13,10 +13,10 @@ import AsyncAutocomplete from "./async-autocomplete.component";
 import UploadPdfComponent from './upload-pdf.component';
 
 
-export default function NewDocFormComponent({ type, onSuccessfulSend }) {
+export default function NewDocFormComponent({ document, type, onSuccessfulSend }) {
     const pdfUpload = type === "LAD";
-    const [infoDate, setInfoDate] = React.useState(new Date());
-    const [scrapDate, setScrapDate] = React.useState(new Date());
+    const [infoDate, setInfoDate] = React.useState(document ? document.infoDate : undefined);
+    const [scrapDate, setScrapDate] = React.useState(document ? document.scrapDate : undefined);
 
     const handleInfoDateChange = (date) => {
         setInfoDate(date);
@@ -27,12 +27,26 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
         setValue("scrapDate", date.toISOString());
     };
 
-    const { register, handleSubmit, setValue } = useForm();
+    const { register, handleSubmit, setValue } = useForm({
+        defaultValues: document ? {
+            webPage: document.webPage,
+            organization: document.organization,
+            section: document.section,
+            keywords: document.keywords.join(","),
+            infoDate: document.infoDate,
+            scrapDate: document.scrapDate,
+            country: document.country,
+            language: document.language,
+            translationType: document.translationType,
+            translation: document.translation,
+            "original-text": document.originalText,
+        } : undefined
+    });
     useEffect(() => {
         if (pdfUpload) {
             register({ name: 'pdf' });
         }
-        register({ name: "keywords" });
+        register({ name: "keywords"  });
         register({ name: "infoDate" });
         register({ name: "scrapDate" });
 
@@ -43,14 +57,17 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
     }, [register, pdfUpload])
 
     const onSubmit = useCallback(data => {
-        console.log(data);
-
-        Api.postDocument(type, data)
-            .then(c => onSuccessfulSend());
-    }, [type])
+        if (document) {
+            Api.editDocument(type, data)
+                .then(c => onSuccessfulSend());
+        } else {
+            Api.postDocument(type, data)
+                .then(c => onSuccessfulSend());
+        }
+    }, [type]);
 
     return (
-        <form id="new-doc-form" onSubmit={handleSubmit(onSubmit)}>
+        <form id={document ? "edit-doc-form" : "new-doc-form"} onSubmit={handleSubmit(onSubmit)}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <Grid container spacing={5}>
                     <Grid container item xs={12} spacing={8} justify="space-around">
@@ -92,6 +109,12 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                                 openOnFocus
                                 fullWidth
                                 multiple
+                                defaultValue={
+                                    document ? document.keywords.map(k => ({
+                                        name: k,
+                                        value: k,
+                                    })) : undefined
+                                }
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -142,6 +165,10 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                                 style={{ width: 300 }}
                                 openOnFocus
                                 onChange={(_, opt) => setValue("country", opt.value)}
+                                defaultValue={document ? {
+                                    name: document.country,
+                                    value: document.country,
+                                } : undefined}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -157,6 +184,10 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                                 style={{ width: 300 }}
                                 openOnFocus
                                 onChange={(_, opt) => setValue("language", opt.value)}
+                                defaultValue={document ? {
+                                    name: document.language,
+                                    value: document.language,
+                                } : undefined}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}
@@ -172,6 +203,10 @@ export default function NewDocFormComponent({ type, onSuccessfulSend }) {
                                 style={{ width: 300 }}
                                 openOnFocus
                                 onChange={(_, opt) => setValue("translationType", opt.value)}
+                                defaultValue={document ? {
+                                    name: document.translationType,
+                                    value: document.translationType,
+                                } : undefined}
                                 renderInput={(params) =>
                                     <TextField
                                         {...params}

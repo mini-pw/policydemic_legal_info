@@ -26,6 +26,7 @@ export default function AsyncAutocomplete(props) {
       const response = await Api.getAutocompleteOptions(props.collectionName);
       const opts = await response.data;
 
+      console.warn(opts);
       if (active) {
         setOptions(opts);
       }
@@ -55,7 +56,7 @@ export default function AsyncAutocomplete(props) {
       getOptionLabel={(option) => option.name}
       options={options}
       loading={loading}
-      
+      defaultValue={props.defaultValue}
       renderInput={(params) => (
         <TextField
           {...params}

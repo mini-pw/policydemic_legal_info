@@ -39,8 +39,8 @@ router.get('/autocomplete/languages', (ctx) => {
 
 router.get('/autocomplete/keywords', (ctx) => {
   ctx.body = JSON.stringify([
-    {name: "School Closing", value: "SchoolClosing"},
-    {name: "Shopping restrictions", value: "ShoppingRestrictions"},
+    {name: "School Closing", value: "School Closing"},
+    {name: "Shopping restrictions", value: "Shopping restrictions"},
   ])
 })
 
@@ -51,6 +51,25 @@ router.get('/autocomplete/translationTypes', (ctx) => {
     {name: "DeepL", value: "DeepL"},
   ])
 })
+
+router.get('/documents/:id', (ctx) => {
+  console.log(ctx.params.id);
+  
+  ctx.body = JSON.stringify({
+      webPage: "web page",
+      organization: "organization",
+      section: "section",
+      keywords: ["School Closing", "Shopping restrictions"],
+      infoDate: new Date(2020, 3, 1),
+      scrapDate: new Date(2020, 4, 1),
+      country: "Poland",
+      language: "Polish",
+      translationType: "Google Translate",
+      translation: "translation",
+      originalText: "translation",
+  })
+})
+
 
 router.get('/', (ctx) => {
   ctx.body = "Hello world!"
