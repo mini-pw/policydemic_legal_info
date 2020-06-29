@@ -7,6 +7,10 @@ export default class Api {
         return this._postFormData(type.toLowerCase(), data)
     }
 
+    static editDocument(type, data) {
+        return this._postFormData(type.toLowerCase(), data)
+    }
+
     static _postFormData(relativeUrl, data) {
         var formData = new FormData();
         Object.keys(data).forEach(key => formData.append(key, data[key]));
@@ -18,7 +22,12 @@ export default class Api {
         })
     }
 
+
     static getAutocompleteOptions(collectionName){
         return axios.get(`${this.baseUrl}/autocomplete/${collectionName}`);
+    }
+
+    static getDocumentById(documentId){
+        return axios.get(`${this.baseUrl}/documents/${documentId}`);
     }
 }

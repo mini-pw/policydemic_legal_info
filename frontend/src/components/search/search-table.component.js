@@ -23,7 +23,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import AddBoxIcon from '@material-ui/icons/AddBox';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import EditIcon from '@material-ui/icons/Edit';
 
 
 function createDataForRow(id, source, infoDate, language, keywords, country) {
@@ -255,7 +255,7 @@ function onMoreClick(event, objId) {
 
 export default function EnhancedTable(props) {
 
-    const { tableTitle } = props;
+    const { tableTitle, onEdit } = props;
 
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
@@ -387,9 +387,9 @@ export default function EnhancedTable(props) {
                                             <TableCell align="right">{row.keywords}</TableCell>
                                             <TableCell align="right">{row.country}</TableCell>
                                             <TableCell align="right">
-                                                <Tooltip title="More">
-                                                    <IconButton aria-label="delete" onClick={(event) => onMoreClick(event, row.id)}>
-                                                        <MoreHorizIcon />
+                                                <Tooltip title="Edit">
+                                                    <IconButton aria-label="edit" onClick={(event) => onEdit(row.id)}>
+                                                        <EditIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
