@@ -94,6 +94,20 @@ router.post('/ssd', upload.single('pdf'), (ctx) => {
   ctx.status = 200
 });
 
+router.post('/crawler/saveConfig', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
+
+  ctx.status = 200
+});
+
+router.post('/crawler/run', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
+
+  ctx.status = 200
+});
+
 app
   .use(cors())
   .use(bodyParser())
