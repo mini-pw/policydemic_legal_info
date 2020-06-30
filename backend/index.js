@@ -12,7 +12,7 @@ router.get('/', (ctx) => {
   ctx.body = "Hello world!"
 })
 
-router.get('/autocomplete/websites', (ctx) => {
+router.get('/autocomplete/webpages', (ctx) => {
   ctx.body = JSON.stringify([
     {name: 'google.com', value: 'google.com'},
     {name: 'bing.com', value: 'bing.com'},
@@ -90,6 +90,20 @@ router.post('/lad', upload.single('pdf'), (ctx) => {
 router.post('/ssd', upload.single('pdf'), (ctx) => {
   console.log(ctx.request)
   console.log(ctx.req.body)
+
+  ctx.status = 200
+});
+
+router.post('/crawler/saveConfig', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
+
+  ctx.status = 200
+});
+
+router.post('/crawler/run', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
 
   ctx.status = 200
 });
