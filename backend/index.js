@@ -12,7 +12,7 @@ router.get('/', (ctx) => {
   ctx.body = "Hello world!"
 })
 
-router.get('/autocomplete/websites', (ctx) => {
+router.get('/autocomplete/webpages', (ctx) => {
   ctx.body = JSON.stringify([
     {name: 'google.com', value: 'google.com'},
     {name: 'bing.com', value: 'bing.com'},

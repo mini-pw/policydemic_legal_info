@@ -100,11 +100,11 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
 
                         <AsyncAutocomplete
                             name="web-pages"
-                            collectionName="web-pages"
+                            collectionName="webpages"
                             style={{ width: 300 }}
                             openOnFocus
                             fullWidth
-                            mutiple
+                            multiple
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -118,7 +118,7 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
                             style={{ width: 300 }}
                             openOnFocus
                             fullWidth
-                            mutiple
+                            multiple
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -132,7 +132,7 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
                             style={{ width: 300 }}
                             openOnFocus
                             fullWidth
-                            mutiple
+                            multiple
                             renderInput={(params) =>
                                 <TextField
                                     {...params}
@@ -142,7 +142,6 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
 
                         <TextField
                             name="any-phrase"
-                            collecitonName
                             label="Any phrase"
                             margin="normal"
                             onChange={(event) => setValue("any-phrase", event.value)}
@@ -152,6 +151,7 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
                 </MuiPickersUtilsProvider>
 
                 <Grid
+                    container
                     style={{ display: 'flex', justifyContent: 'flex-end' }}
                     justify="space-around"
                 >
@@ -159,7 +159,6 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
                     <Button
                         variant="contained"
                         className="button-submit"
-                        primary={true}
                         style={{ position: 'relative', right: 5, top: 5, margin: 5 }}
                         onClick={(event) => onResetClicked(event)}>
                         Reset
@@ -170,7 +169,6 @@ export default function SearchFormComponent({ type, onSearch, onReset }) {
                         className="button-submit"
                         color="primary"
                         type="submit"
-                        primary={true}
                         style={{ position: 'relative', right: 5, top: 5, margin: 5 }}
                         form="search-form" 
                     >

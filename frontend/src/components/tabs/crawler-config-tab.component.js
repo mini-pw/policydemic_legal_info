@@ -183,7 +183,9 @@ export default function CrawlerConfigTabComponent() {
                 onChange={(e) => setDayOfWeek(e.target.value)}
               >
                 {daysOfWeek.map((day) => (
-                  <MenuItem value={day}>{day}</MenuItem>
+                  <MenuItem value={day} key={day}>
+                    {day}
+                  </MenuItem>
                 ))}
               </Select>
             </Grid>
@@ -242,7 +244,6 @@ export default function CrawlerConfigTabComponent() {
               <Button
                 variant="contained"
                 color="primary"
-                primary
                 endIcon={<SendIcon />}
                 onClick={runCrawler}
               >
@@ -250,12 +251,7 @@ export default function CrawlerConfigTabComponent() {
               </Button>
             </Grid>
             <Grid item>
-              <Button
-                variant="contained"
-                color="primary"
-                primary
-                onClick={saveConfig}
-              >
+              <Button variant="contained" color="primary" onClick={saveConfig}>
                 Save
               </Button>
             </Grid>
