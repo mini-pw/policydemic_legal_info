@@ -23,6 +23,9 @@ export default class SearchResultsListComponent extends React.Component {
                 <SearchTableComponent 
                     tableTitle={this.props.headerCaption}
                     onAddNewItemClick={this.props.onAddNewItemClick}
+                    onDelete={this.props.onDelete}
+                    onEdit={this.props.onEdit}
+                    rows={this.props.searchResultsList}
                 />
             </Box>
         )

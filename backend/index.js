@@ -12,7 +12,7 @@ router.get('/', (ctx) => {
   ctx.body = "Hello world!"
 })
 
-router.get('/autocomplete/websites', (ctx) => {
+router.get('/autocomplete/webpages', (ctx) => {
   ctx.body = JSON.stringify([
     {name: 'google.com', value: 'google.com'},
     {name: 'bing.com', value: 'bing.com'},
@@ -39,8 +39,8 @@ router.get('/autocomplete/languages', (ctx) => {
 
 router.get('/autocomplete/keywords', (ctx) => {
   ctx.body = JSON.stringify([
-    {name: "School Closing", value: "SchoolClosing"},
-    {name: "Shopping restrictions", value: "ShoppingRestrictions"},
+    {name: "School Closing", value: "School Closing"},
+    {name: "Shopping restrictions", value: "Shopping restrictions"},
   ])
 })
 
@@ -51,6 +51,25 @@ router.get('/autocomplete/translationTypes', (ctx) => {
     {name: "DeepL", value: "DeepL"},
   ])
 })
+
+router.get('/documents/:id', (ctx) => {
+  console.log(ctx.params.id);
+  
+  ctx.body = JSON.stringify({
+      webPage: "web page",
+      organization: "organization",
+      section: "section",
+      keywords: ["School Closing", "Shopping restrictions"],
+      infoDate: new Date(2020, 3, 1),
+      scrapDate: new Date(2020, 4, 1),
+      country: "Poland",
+      language: "Polish",
+      translationType: "Google Translate",
+      translation: "translation",
+      originalText: "translation",
+  })
+})
+
 
 router.get('/', (ctx) => {
   ctx.body = "Hello world!"
@@ -71,6 +90,20 @@ router.post('/lad', upload.single('pdf'), (ctx) => {
 router.post('/ssd', upload.single('pdf'), (ctx) => {
   console.log(ctx.request)
   console.log(ctx.req.body)
+
+  ctx.status = 200
+});
+
+router.post('/crawler/saveConfig', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
+
+  ctx.status = 200
+});
+
+router.post('/crawler/run', (ctx) => {
+  console.log(ctx.request)
+  console.log(ctx.request.body)
 
   ctx.status = 200
 });

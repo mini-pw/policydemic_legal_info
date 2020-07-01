@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -10,7 +11,7 @@ function sleep(delay = 0) {
   });
 }
 
-export default function AsyncAutocomplete(props) {
+export default function AsyncAutocomplete({collectionName, defaultValue, ...restProps}) {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const loading = open && options.length === 0;
@@ -23,9 +24,10 @@ export default function AsyncAutocomplete(props) {
     }
 
     (async () => {
-      const response = await Api.getAutocompleteOptions(props.collectionName);
+      const response = await Api.getAutocompleteOptions(collectionName);
       const opts = await response.data;
 
+      console.warn(opts);
       if (active) {
         setOptions(opts);
       }
@@ -55,7 +57,7 @@ export default function AsyncAutocomplete(props) {
       getOptionLabel={(option) => option.name}
       options={options}
       loading={loading}
-      
+      defaultValue={defaultValue}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -70,7 +72,12 @@ export default function AsyncAutocomplete(props) {
           }}
         />
       )}
-      {...props}
+      {...restProps}
     />
   );
 }
+
+AsyncAutocomplete.propTypes = {
+  collectionName: PropTypes.string.isRequired,
+  defaultValue: PropTypes.any,
+};

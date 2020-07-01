@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import 'date-fns';
+import { useForm } from "react-hook-form";
 
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
@@ -10,85 +11,50 @@ import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/picker
 import DateFnsUtils from '@date-io/date-fns';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import AsyncAutocomplete from '../form/async-autocomplete.component';
 
-export default function SearchFormComponent() {
-
-    const webPages = [
-        'google.com',
-        'bing.com'
-    ];
-
-    const languages = [
-        'Polish',
-        'English'
-    ];
-
-    const countries = [
-        'Poland',
-        'USA'
-    ]
+export default function SearchFormComponent({ type, onSearch, onReset }) {
 
     const aWeekAgo = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
 
     const [selectedDateFrom, setSelectedDateFrom] = React.useState(aWeekAgo);
     const handleChangeDateFrom = (date) => {
         setSelectedDateFrom(date);
+        setValue("dateTo", date.toISOString());
     };
 
     const [selectedDateTo, setSelectedDateTo] = React.useState(new Date());
     const handleChangeDateTo = (date) => {
         setSelectedDateTo(date);
+        setValue("dateFrom", date.toISOString());
     };
-
-    const [selectedWebPage, setSelectedWebPage] = React.useState();
-    const handleSetSelectedWebPage = (event, newValue, reason, details) => {
-        setSelectedWebPage(newValue);
-    }
-
-    const [selectedLanguage, setSelectedLanguage] = React.useState();
-    const handleSetSelectedLanguage = (event, newValue, reason, details) => {
-        setSelectedLanguage(newValue);
-    }
-
-    const [selectedCountry, setSelectedCountry] = React.useState();
-    const handleSetSelectedCountry = (event, newValue, reason, details) => {
-        setSelectedCountry(newValue);
-    }
-
-    const [selectedPhrase, setSelectedPhrase] = React.useState();
-    const handleSetSelectedPhrase = (event) => {
-        setSelectedPhrase(event.target.value);
-    }
 
     const onResetClicked = (event) => {
 
         setSelectedDateFrom(aWeekAgo);
         setSelectedDateTo(new Date());
-        setSelectedWebPage("");
-        setSelectedCountry("");
-        setSelectedCountry("");
-        setSelectedPhrase("");
         
+        // setValue("web-page", []);
+        // setValue("language", []);
+        // setValue("country", []);
+        // setValue("any-phrase", "");
+
+        document.getElementById("search-form").reset();
+
+        onReset();
     };
-    
-    const onSearchClicked = (event) => {
 
-        var searchData = {
-            dateFrom: selectedDateFrom,
-            dateTo: selectedDateTo,
-            webPage: selectedWebPage,
-            language: selectedLanguage,
-            country: selectedCountry,
-            phrase: selectedPhrase
-        }
+    const onSubmit = useCallback(data => {
+        console.log(data);
 
-        var jsonData = JSON.stringify(searchData);
+        onSearch(data);
 
-        alert("search:\n" + jsonData);
-    };
+    }, [type])
+
+    const { register, handleSubmit, setValue } = useForm();
 
     return (
-        <form>
+        <form id="search-form" onSubmit={handleSubmit(onSubmit)}>
             <Box
                 boxShadow={3}
                 textAlign="left"
@@ -130,59 +96,62 @@ export default function SearchFormComponent() {
                             }}
                         />
 
-{/* TODO: https://material-ui.com/components/autocomplete/#asynchronous-requests */}
+                        {/* TODO: https://material-ui.com/components/autocomplete/#asynchronous-requests */}
 
-                        <Autocomplete
-                            id="web-page"
-                            options={webPages}
+                        <AsyncAutocomplete
+                            name="web-pages"
+                            collectionName="webpages"
                             style={{ width: 300 }}
                             openOnFocus
-                            inputValue={selectedWebPage}
-                            onInputChange={handleSetSelectedWebPage}
-                            renderInput={(params) => 
+                            fullWidth
+                            multiple
+                            renderInput={(params) =>
                                 <TextField
                                     {...params}
                                     label="Web page" margin="normal" />}
+                            onChange={(_, opts) => setValue("web-page", opts.map(o => o.value).join(','))}
                         />
 
-                        <Autocomplete
-                            id="language"
-                            options={languages}
+                        <AsyncAutocomplete
+                            name="languages"
+                            collectionName="languages"
                             style={{ width: 300 }}
                             openOnFocus
-                            onInputChange={handleSetSelectedLanguage}
-                            inputValue={selectedLanguage}
-                            renderInput={(params) => 
-                                <TextField 
-                                    {...params} 
+                            fullWidth
+                            multiple
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
                                     label="Language" margin="normal" />}
+                            onChange={(_, opts) => setValue("language", opts.map(o => o.value).join(','))}
                         />
 
-                        <Autocomplete
-                            id="country"
-                            options={countries}
+                        <AsyncAutocomplete
+                            name="country"
+                            collectionName="countries"
                             style={{ width: 300 }}
                             openOnFocus
-                            onInputChange={handleSetSelectedCountry}
-                            inputValue={selectedCountry}
-                            renderInput={(params) => 
-                                <TextField 
-                                    {...params} 
+                            fullWidth
+                            multiple
+                            renderInput={(params) =>
+                                <TextField
+                                    {...params}
                                     label="Country" margin="normal" />}
+                            onChange={(_, opts) => setValue("country", opts.map(o => o.value).join(','))}
                         />
 
                         <TextField
-                            id="any-phrase"
+                            name="any-phrase"
                             label="Any phrase"
                             margin="normal"
-                            onChange={handleSetSelectedPhrase}
-                            value={selectedPhrase}
+                            onChange={(event) => setValue("any-phrase", event.value)}
                         />
 
                     </Grid>
                 </MuiPickersUtilsProvider>
 
                 <Grid
+                    container
                     style={{ display: 'flex', justifyContent: 'flex-end' }}
                     justify="space-around"
                 >
@@ -190,19 +159,18 @@ export default function SearchFormComponent() {
                     <Button
                         variant="contained"
                         className="button-submit"
-                        primary={true}
                         style={{ position: 'relative', right: 5, top: 5, margin: 5 }}
                         onClick={(event) => onResetClicked(event)}>
                         Reset
-                        </Button>
+                    </Button>
 
                     <Button
                         variant="contained"
                         className="button-submit"
                         color="primary"
-                        primary={true}
+                        type="submit"
                         style={{ position: 'relative', right: 5, top: 5, margin: 5 }}
-                        onClick={(event) => onSearchClicked(event)}
+                        form="search-form" 
                     >
                         Search
                     </Button>

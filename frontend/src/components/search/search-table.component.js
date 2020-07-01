@@ -23,25 +23,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 import AddBoxIcon from '@material-ui/icons/AddBox';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-
-
-function createDataForRow(id, source, infoDate, language, keywords, country) {
-    return {
-        id: id,
-        source: source,
-        infoDate: infoDate,
-        language: language,
-        keywords: keywords,
-        country: country
-    };
-}
-
-const rows = [
-    createDataForRow(1, "International Labour Organization", new Date(1995, 4, 4), "english", "cinemas", "Canada"),
-    createDataForRow(2, "Coronavirus Government Response Tracker", new Date(1998, 0, 14), "french", "pubs", "Italy"),
-    createDataForRow(3, "Coronavirus Government Response Tracker", new Date(1990, 3, 24), "french", "pubs", "Italy")
-];
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteConfirmationDialogComponent from './delete-dialog.component.js';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -247,22 +230,22 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function onMoreClick(event, objId) {
-    event.stopPropagation();
-
-    alert("More: " + objId);
-}
-
 export default function EnhancedTable(props) {
 
-    const { tableTitle } = props;
+    const { tableTitle, rows, onDelete, onEdit } = props;
 
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
+    const [selected, setSelected] = React.useState([], );
     const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5); 
+    
+    const [deleteDialogVisible, setDeleteDialogVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        setSelected([]);
+    }, [props.rows]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -312,7 +295,6 @@ export default function EnhancedTable(props) {
 
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
-
     const uploadJsonButtonClicked = (event) => {
         alert("upload json");
     };
@@ -325,11 +307,15 @@ export default function EnhancedTable(props) {
         alert("download items: " + selected);
     };
 
-    const deleteButtonClicked = (event) => {
-        alert("delete items: " + selected);
-    };
-
     return (
+        <div>
+        <DeleteConfirmationDialogComponent
+            dialogVisible={deleteDialogVisible}
+            onDeleteExecute={() => {
+                onDelete(selected);
+                setDeleteDialogVisible(false);}}
+            onDeleteCancelExecute={() => setDeleteDialogVisible(false)}
+        />
         <Container className={classes.root}>
             <Paper className={classes.paper}>
                 <EnhancedTableToolbar
@@ -338,7 +324,7 @@ export default function EnhancedTable(props) {
                     onUploadJSONClick={uploadJsonButtonClicked}
                     onAddNewItemClick={addNewItemButtonClicked}
                     onDownloadSelectedClick={downloadSelectedButtonClicked}
-                    onDeleteClick={deleteButtonClicked}
+                    onDeleteClick={() => setDeleteDialogVisible(true)}
                 />
                 <TableContainer>
                     <Table
@@ -370,7 +356,7 @@ export default function EnhancedTable(props) {
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
-                                            key={row.name}
+                                            key={row.id}
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
@@ -387,9 +373,9 @@ export default function EnhancedTable(props) {
                                             <TableCell align="right">{row.keywords}</TableCell>
                                             <TableCell align="right">{row.country}</TableCell>
                                             <TableCell align="right">
-                                                <Tooltip title="More">
-                                                    <IconButton aria-label="delete" onClick={(event) => onMoreClick(event, row.id)}>
-                                                        <MoreHorizIcon />
+                                                <Tooltip title="Edit">
+                                                    <IconButton aria-label="edit" onClick={(event) => { event.stopPropagation(); onEdit(row.id); }}>
+                                                        <EditIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
@@ -406,7 +392,7 @@ export default function EnhancedTable(props) {
                 </TableContainer>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
-                    component="Container"
+                    component={Container}
                     count={rows.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
@@ -415,5 +401,6 @@ export default function EnhancedTable(props) {
                 />
             </Paper>
         </Container>
+        </div>
     );
 }
