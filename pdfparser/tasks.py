@@ -1,9 +1,12 @@
+import PyPDF2
+
+import collections
+
 from scheduler.celery import app
 
 import pytesseract
 from PIL import Image
 from wand.image import Image as wi
-=======
 
 # --- required for complex criterion --- #
 import flair
