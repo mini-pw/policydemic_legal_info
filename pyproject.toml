@@ -7,6 +7,7 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 celery = "^4.4.5"
+requests = "^2.24.0"
 scrapy = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
