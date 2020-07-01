@@ -1,4 +1,6 @@
-from PyPDF2 import PdfFileReader
+import PyPDF2
+
+import collections
 
 from scheduler.celery import app
 
