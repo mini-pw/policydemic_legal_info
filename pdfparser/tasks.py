@@ -127,3 +127,6 @@ def parse(path, key_words=set(), without=set(), at_least=1, at_most=1, crit="sim
         crit = simple_crit if crit == "simple" else complex_crit
         return [t for t in pdf_text_list if crit(t, key_words, without=without, at_least=at_least, at_most=at_most)]
 
+@app.task
+def process_pdf_link(http_url):
+    print(f"Received pdf: {http_url}")
