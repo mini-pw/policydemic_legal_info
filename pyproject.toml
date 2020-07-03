@@ -12,6 +12,10 @@ pypdf2 = "^1.26.0"
 requests = "^2.24.0"
 scrapy = "^2.2.0"
 billiard = "3.6.3.0"
+pytesseract = "^0.3.4"
+wand = "^0.6.1"
+flair = "^0.5"
+pandas = "^1.0.5"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
