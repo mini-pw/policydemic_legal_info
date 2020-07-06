@@ -12,6 +12,7 @@ pypdf2 = "^1.26.0"
 requests = "^2.24.0"
 scrapy = "^2.2.0"
 billiard = "3.6.3.0"
+ibm-watson = "^4.5.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"

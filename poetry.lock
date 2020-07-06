@@ -245,6 +245,33 @@ idna = ">=2.5"
 
 [[package]]
 category = "main"
+description = "Client library for the IBM Cloud services"
+name = "ibm-cloud-sdk-core"
+optional = false
+python-versions = "*"
+version = "1.5.1"
+
+[package.dependencies]
+PyJWT = ">=1.7.1"
+python_dateutil = ">=2.5.3"
+requests = ">=2.0,<3.0"
+
+[[package]]
+category = "main"
+description = "Client library to use the IBM Watson Services"
+name = "ibm-watson"
+optional = false
+python-versions = "*"
+version = "4.5.0"
+
+[package.dependencies]
+ibm_cloud_sdk_core = "1.5.1"
+python_dateutil = ">=2.5.3"
+requests = ">=2.0,<3.0"
+websocket-client = "0.48.0"
+
+[[package]]
+category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -413,6 +440,19 @@ version = "2.0.2"
 
 [[package]]
 category = "main"
+description = "JSON Web Token implementation in Python"
+name = "pyjwt"
+optional = false
+python-versions = "*"
+version = "1.7.1"
+
+[package.extras]
+crypto = ["cryptography (>=1.4)"]
+flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
+test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner (>=4.2,<5.0.0)"]
+
+[[package]]
+category = "main"
 description = "Python wrapper module around the OpenSSL library"
 name = "pyopenssl"
 optional = false
@@ -443,6 +483,17 @@ name = "pypydispatcher"
 optional = false
 python-versions = "*"
 version = "2.1.2"
+
+[[package]]
+category = "main"
+description = "Extensions to the standard Python datetime module"
+name = "python-dateutil"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+version = "2.8.1"
+
+[package.dependencies]
+six = ">=1.5"
 
 [[package]]
 category = "main"
@@ -628,6 +679,17 @@ six = ">=1.4.1"
 
 [[package]]
 category = "main"
+description = "WebSocket client for python. hybi13 is supported."
+name = "websocket-client"
+optional = false
+python-versions = "*"
+version = "0.48.0"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
+category = "main"
 description = "Interfaces for Python"
 name = "zope.interface"
 optional = false
@@ -643,7 +705,7 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "34b8c34626ea18fb30533706da28e2c25366c89fc55db3c5f3c08ec4741da89a"
+content-hash = "c643168160b3f7a6bfb755bc6f6899c15cf6b702a405777fcad9b7967bbc0c5a"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -761,6 +823,12 @@ hyperlink = [
     {file = "hyperlink-19.0.0-py2.py3-none-any.whl", hash = "sha256:ab4a308feb039b04f855a020a6eda3b18ca5a68e6d8f8c899cbe9e653721d04f"},
     {file = "hyperlink-19.0.0.tar.gz", hash = "sha256:4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654"},
 ]
+ibm-cloud-sdk-core = [
+    {file = "ibm-cloud-sdk-core-1.5.1.tar.gz", hash = "sha256:62b00255df06cb96e32b8daa6dee78b073690591a2d2ec16b24d99f1c39180f7"},
+]
+ibm-watson = [
+    {file = "ibm-watson-4.5.0.tar.gz", hash = "sha256:f6f46b67ffc41080e0a8ef24569bf435a435c26fd54b23e49a81f1a68517cd46"},
+]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
@@ -871,6 +939,10 @@ pyhamcrest = [
     {file = "PyHamcrest-2.0.2-py3-none-any.whl", hash = "sha256:7ead136e03655af85069b6f47b23eb7c3e5c221aa9f022a4fbb499f5b7308f29"},
     {file = "PyHamcrest-2.0.2.tar.gz", hash = "sha256:412e00137858f04bde0729913874a48485665f2d36fe9ee449f26be864af9316"},
 ]
+pyjwt = [
+    {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
+    {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
+]
 pyopenssl = [
     {file = "pyOpenSSL-19.1.0-py2.py3-none-any.whl", hash = "sha256:621880965a720b8ece2f1b2f54ea2071966ab00e2970ad2ce11d596102063504"},
     {file = "pyOpenSSL-19.1.0.tar.gz", hash = "sha256:9a24494b2602aaf402be5c9e30a0b82d4a5c67528fe8fb475e3f3bc00dd69507"},
@@ -880,6 +952,10 @@ pypdf2 = [
 ]
 pypydispatcher = [
     {file = "PyPyDispatcher-2.1.2.tar.gz", hash = "sha256:b6bec5dfcff9d2535bca2b23c80eae367b1ac250a645106948d315fcfa9130f2"},
+]
+python-dateutil = [
+    {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
+    {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 pytz = [
     {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
@@ -994,6 +1070,10 @@ vine = [
 w3lib = [
     {file = "w3lib-1.22.0-py2.py3-none-any.whl", hash = "sha256:0161d55537063e00d95a241663ede3395c4c6d7b777972ba2fd58bbab2001e53"},
     {file = "w3lib-1.22.0.tar.gz", hash = "sha256:0ad6d0203157d61149fd45aaed2e24f53902989c32fc1dccc2e2bfba371560df"},
+]
+websocket-client = [
+    {file = "websocket_client-0.48.0-py2.py3-none-any.whl", hash = "sha256:db70953ae4a064698b27ae56dcad84d0ee68b7b43cb40940f537738f38f510c1"},
+    {file = "websocket_client-0.48.0.tar.gz", hash = "sha256:18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"},
 ]
 "zope.interface" = [
     {file = "zope.interface-5.1.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:645a7092b77fdbc3f68d3cc98f9d3e71510e419f54019d6e282328c0dd140dcd"},
