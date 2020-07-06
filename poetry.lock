@@ -450,6 +450,31 @@ dev = ["black", "pre-commit", "nose", "pytest"]
 mongotrials = ["pymongo"]
 sparktrials = ["pyspark"]
 
+description = "Client library for the IBM Cloud services"
+name = "ibm-cloud-sdk-core"
+optional = false
+python-versions = "*"
+version = "1.5.1"
+
+[package.dependencies]
+PyJWT = ">=1.7.1"
+python_dateutil = ">=2.5.3"
+requests = ">=2.0,<3.0"
+
+[[package]]
+category = "main"
+description = "Client library to use the IBM Watson Services"
+name = "ibm-watson"
+optional = false
+python-versions = "*"
+version = "4.5.0"
+
+[package.dependencies]
+ibm_cloud_sdk_core = "1.5.1"
+python_dateutil = ">=2.5.3"
+requests = ">=2.0,<3.0"
+websocket-client = "0.48.0"
+
 [[package]]
 category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -770,6 +795,19 @@ name = "pyhamcrest"
 optional = false
 python-versions = ">=3.5"
 version = "2.0.2"
+
+[[package]]
+category = "main"
+description = "JSON Web Token implementation in Python"
+name = "pyjwt"
+optional = false
+python-versions = "*"
+version = "1.7.1"
+
+[package.extras]
+crypto = ["cryptography (>=1.4)"]
+flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
+test = ["pytest (>=4.0.1,<5.0.0)", "pytest-cov (>=2.6.0,<3.0.0)", "pytest-runner (>=4.2,<5.0.0)"]
 
 [[package]]
 category = "main"
@@ -1252,6 +1290,15 @@ optional = false
 python-versions = "*"
 version = "1.12.1"
 
+description = "WebSocket client for python. hybi13 is supported."
+name = "websocket-client"
+optional = false
+python-versions = "*"
+version = "0.48.0"
+
+[package.dependencies]
+six = "*"
+
 [[package]]
 category = "main"
 description = "Interfaces for Python"
@@ -1507,6 +1554,11 @@ hyperlink = [
 hyperopt = [
     {file = "hyperopt-0.2.4-py2.py3-none-any.whl", hash = "sha256:9e443c4da031b1d2280ee5140e524e209bae0cd6d59a0401f2ab23a144c89edb"},
     {file = "hyperopt-0.2.4.tar.gz", hash = "sha256:6e72089a42eb70cf84b0567d4552a908adff7cfc5cf6b1c38add41adc775d9c6"},
+ibm-cloud-sdk-core = [
+    {file = "ibm-cloud-sdk-core-1.5.1.tar.gz", hash = "sha256:62b00255df06cb96e32b8daa6dee78b073690591a2d2ec16b24d99f1c39180f7"},
+]
+ibm-watson = [
+    {file = "ibm-watson-4.5.0.tar.gz", hash = "sha256:f6f46b67ffc41080e0a8ef24569bf435a435c26fd54b23e49a81f1a68517cd46"},
 ]
 idna = [
     {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
@@ -1762,6 +1814,10 @@ pyflakes = [
 pyhamcrest = [
     {file = "PyHamcrest-2.0.2-py3-none-any.whl", hash = "sha256:7ead136e03655af85069b6f47b23eb7c3e5c221aa9f022a4fbb499f5b7308f29"},
     {file = "PyHamcrest-2.0.2.tar.gz", hash = "sha256:412e00137858f04bde0729913874a48485665f2d36fe9ee449f26be864af9316"},
+]
+pyjwt = [
+    {file = "PyJWT-1.7.1-py2.py3-none-any.whl", hash = "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e"},
+    {file = "PyJWT-1.7.1.tar.gz", hash = "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"},
 ]
 pyopenssl = [
     {file = "pyOpenSSL-19.1.0-py2.py3-none-any.whl", hash = "sha256:621880965a720b8ece2f1b2f54ea2071966ab00e2970ad2ce11d596102063504"},
@@ -2035,6 +2091,9 @@ wcwidth = [
 ]
 wrapt = [
     {file = "wrapt-1.12.1.tar.gz", hash = "sha256:b62ffa81fb85f4332a4f609cab4ac40709470da05643a082ec1eb88e6d9b97d7"},
+websocket-client = [
+    {file = "websocket_client-0.48.0-py2.py3-none-any.whl", hash = "sha256:db70953ae4a064698b27ae56dcad84d0ee68b7b43cb40940f537738f38f510c1"},
+    {file = "websocket_client-0.48.0.tar.gz", hash = "sha256:18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"},
 ]
 "zope.interface" = [
     {file = "zope.interface-5.1.0-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:645a7092b77fdbc3f68d3cc98f9d3e71510e419f54019d6e282328c0dd140dcd"},
