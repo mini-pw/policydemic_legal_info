@@ -3,10 +3,14 @@ const KoaRouter = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const multer = require('koa-multer');
 const cors = require('@koa/cors');
+const { Client } = require('@elastic/elasticsearch')
+const client = new Client({node: 'http:/localhost:9200'})
+
 
 const app = new Koa();
 const router = new KoaRouter();
 const upload = multer();
+
 
 router.get('/', (ctx) => {
   ctx.body = "Hello world!"
@@ -14,8 +18,9 @@ router.get('/', (ctx) => {
 
 router.get('/autocomplete/webpages', (ctx) => {
   ctx.body = JSON.stringify([
-    {name: 'google.com', value: 'google.com'},
-    {name: 'bing.com', value: 'bing.com'},
+      {name: 'google.com', value: 'google.com'},
+      {name: 'test', value: 'test_webpage.com'},
+      {name: 'bing.com', value: 'bing.com'},
   ])
 })
 
@@ -107,6 +112,201 @@ router.post('/crawler/run', (ctx) => {
 
   ctx.status = 200
 });
+
+router.get('/populate', (ctx) => {
+    populate().then(r => console.log(r)).catch(console.log)
+    ctx.status = 200
+})
+async function populate (){
+
+    await client.index({
+        index: 'documents',
+        body:{
+                web_page: 'test_webpage23.com',
+                document_type: 'legal_act',
+                pdf_path: 'test_path',
+                scrap_date: '2020-10-23 10:00:00',
+                info_date: '2020-12-12',
+                country: "Poland",
+                language: "Polish",
+                translation_type: "automatic",
+                text_parsing_type: "ocr",
+                keywords: ["test_kw"],
+                original_text: "Oryginalny tekst dokumentu",
+                translated_text: "Original text of the document",
+                section: null
+        }
+    })
+        .catch(e => {
+            console.log(e)
+        });
+
+    await client.index({
+        index: 'documents',
+        body:{
+            web_page: 'test_webpage.gov.pl',
+            document_type: 'secondary',
+            pdf_path: 'test_path',
+            scrap_date: '2020-10-05 10:00:00',
+            info_date: '2020-12-15',
+            country: "Poland",
+            language: "Polish",
+            translation_type: "automatic",
+            text_parsing_type: "ocr",
+            keywords: ["si", "certo", "torro"],
+            original_text: "Oryginalny tekst dokumentu",
+            translated_text: "Original text of the document",
+            section: null
+        }
+    })
+        .catch(e => {
+            console.log(e)
+        });
+
+    await client.index({
+        index: 'documents',
+        body:{
+            web_page: 'test_webpageDE.com',
+            document_type: 'legal_act',
+            pdf_path: 'test_path',
+            scrap_date: '2020-11-23 10:00:00',
+            info_date: '2020-07-12',
+            country: "Germany",
+            language: "German",
+            translation_type: "manual",
+            text_parsing_type: "parser",
+            keywords: ["covid", "bulk"],
+            original_text: "Oryginalny tekst dokumentu",
+            translated_text: "Original text of the document",
+            section: null
+        }
+    })
+        .catch(e => {
+            console.log(e)
+        });
+
+    await client.index({
+        index: 'documents',
+        body:{
+            web_page: 'italian.gov.com',
+            document_type: 'secondary',
+            pdf_path: 'test_path',
+            scrap_date: '2020-01-23 10:00:00',
+            info_date: '2020-02-12',
+            country: "Italy",
+            language: "Italian",
+            translation_type: "automatic",
+            text_parsing_type: "ocr",
+            keywords: ["testIT", "pizza", "espresso"],
+            original_text: "Oryginalny tekst dokumentu",
+            translated_text: "Original text of the document",
+            section: null
+        }
+    })
+        .catch(e => {
+            console.log(e)
+        });
+
+    await client.index({
+        index: 'documents',
+        body:{
+            web_page: 'test_webpage23.com',
+            document_type: 'secondary',
+            pdf_path: 'test_path',
+            scrap_date: '2020-10-23 10:00:00',
+            info_date: '2020-12-12',
+            country: "Poland",
+            language: "Polish",
+            translation_type: "automatic",
+            text_parsing_type: "ocr",
+            keywords: "test_kw",
+            original_text: "Oryginalny tekst dokumentu",
+            translated_text: "Original text of the document",
+            section: null
+        }
+    })
+        .catch(e => {
+            console.log(e)
+        });
+
+
+
+    await client.indices.refresh({
+        index: 'documents'
+    })
+}
+async function getDocuments(ctx, documentType) {
+    const data = await fetchDocumentsFromElastic(ctx.request.body, documentType)
+        .catch(console.log)
+        .then(resp => {
+            ctx.body = parseData(resp);
+            ctx.status = 200
+        }, error => {
+            console.log("Error " + error)
+        })
+}
+
+router.post('/ssd/search', async (ctx) => {
+    console.log(ctx.request.body)
+    await getDocuments(ctx, "secondary");
+});
+
+
+function parseData(data){
+    const parsedData = [];
+    data.forEach(element => {
+        parsedData.push({
+            id: element._id,
+            source: element._source.organization,
+            infoDate: element._source.info_date,
+            language: element._source.language,
+            keywords: element._source.keywords,
+            country: element._source.country
+        })
+    });
+    return parsedData;
+}
+async function fetchDocumentsFromElastic(body, documentType){
+    params = constructParams(body, documentType)
+    let request = await client.search(params);
+    return  request.body.hits.hits;
+}
+function constructParams(body, documentType){
+    let params = {
+        index: 'documents',
+        body: {
+            query:{
+                bool: {
+                    must: [{ range: { info_date: { gte: body.infoDateFrom, lte: body.infoDateTo }}},
+                           { match: {document_type: documentType}}],
+                    filter: []
+                }
+            }
+        }
+    }
+    let fields = ["web_page", "country", "language", "keywords" ];
+
+    for(let i = 0; i < fields.length; i++){
+        let termsObj = {};
+        if (body[fields[i]].length > 0) {
+            termsObj[fields[i]] = body[fields[i]];
+            params.body.query.bool.filter.push({
+                terms: termsObj
+            })
+        }
+        }
+
+    console.log(params)
+    return params
+}
+
+
+router.post('/lad/search', async (ctx) => {
+    console.log(ctx.request)
+    await getDocuments(ctx, "legal_act");
+});
+
+
 
 app
   .use(cors())
