@@ -123,7 +123,7 @@ async function populate (){
         index: 'documents',
         body:{
                 web_page: 'test_webpage23.com',
-                document_type: 'legal_act',
+                document_type: 'legalact',
                 pdf_path: 'test_path',
                 scrap_date: '2020-10-23 10:00:00',
                 info_date: '2020-12-12',
@@ -134,6 +134,7 @@ async function populate (){
                 keywords: ["test_kw"],
                 original_text: "Oryginalny tekst dokumentu",
                 translated_text: "Original text of the document",
+                organization: "Test1",
                 section: null
         }
     })
@@ -156,6 +157,7 @@ async function populate (){
             keywords: ["si", "certo", "torro"],
             original_text: "Oryginalny tekst dokumentu",
             translated_text: "Original text of the document",
+            organization: "Test2",
             section: null
         }
     })
@@ -167,7 +169,7 @@ async function populate (){
         index: 'documents',
         body:{
             web_page: 'test_webpageDE.com',
-            document_type: 'legal_act',
+            document_type: 'legalact',
             pdf_path: 'test_path',
             scrap_date: '2020-11-23 10:00:00',
             info_date: '2020-07-12',
@@ -177,6 +179,7 @@ async function populate (){
             text_parsing_type: "parser",
             keywords: ["covid", "bulk"],
             original_text: "Oryginalny tekst dokumentu",
+            organization: "Test3",
             translated_text: "Original text of the document",
             section: null
         }
@@ -199,6 +202,7 @@ async function populate (){
             text_parsing_type: "ocr",
             keywords: ["testIT", "pizza", "espresso"],
             original_text: "Oryginalny tekst dokumentu",
+            organization: "Test1",
             translated_text: "Original text of the document",
             section: null
         }
@@ -221,6 +225,7 @@ async function populate (){
             text_parsing_type: "ocr",
             keywords: "test_kw",
             original_text: "Oryginalny tekst dokumentu",
+            organization: "Test2",
             translated_text: "Original text of the document",
             section: null
         }
@@ -267,7 +272,7 @@ function parseData(data){
     return parsedData;
 }
 async function fetchDocumentsFromElastic(body, documentType){
-    params = constructParams(body, documentType)
+    let params = constructParams(body, documentType)
     let request = await client.search(params);
     return  request.body.hits.hits;
 }
@@ -277,37 +282,56 @@ function constructParams(body, documentType){
         body: {
             query:{
                 bool: {
-                    must: [{ range: { info_date: { gte: body.infoDateFrom, lte: body.infoDateTo }}},
-                           { match: {document_type: documentType}}],
-                    filter: []
+                    must: [
+                        { match: { document_type: documentType}}],
                 }
             }
         }
     }
+
+    if(body.infoDateTo.length > 0 && body.infoDateFrom.length > 0){
+        params.body.query.bool.must.push({ range: { info_date: { gte: body.infoDateFrom, lte: body.infoDateTo }}},)
+    }
+
     let fields = ["web_page", "country", "language", "keywords" ];
 
     for(let i = 0; i < fields.length; i++){
-        let termsObj = {};
+
         if (body[fields[i]].length > 0) {
-            termsObj[fields[i]] = body[fields[i]];
-            params.body.query.bool.filter.push({
-                terms: termsObj
-            })
-        }
+            let boolStatement = {
+                bool: {
+                    should: []
+                }
+            };
+            for( let j=0; j<body[fields[i]].length; j++) {
+
+                let matchStatement = {
+                    match: ""
+                };
+                let fieldStatement = {};
+
+                fieldStatement[fields[i]] = body[fields[i]][j]
+                matchStatement["match"] = fieldStatement
+                boolStatement.bool.should.push(matchStatement)
+            }
+
+            params.body.query.bool.must.push(boolStatement)
+            }
         }
 
-    console.log(params)
+    console.log(JSON.stringify(params))
     return params
 }
 
 
 router.post('/lad/search', async (ctx) => {
     console.log(ctx.request)
-    await getDocuments(ctx, "legal_act");
+    await getDocuments(ctx, "legalact");
 });
 
 
 
+module.exports = constructParams;
 app
   .use(cors())
   .use(bodyParser())
