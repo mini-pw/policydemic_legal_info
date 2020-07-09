@@ -54,19 +54,19 @@ def pdfocr(path, lang='eng'):
 # --------- Complex criterion --------- #
 def cos(u,v):
     return u @ v / u.norm() / v.norm()
-def complex_crit(text, key_words, without=set(), at_least=1, at_most=1, threshold=0.3):
+def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.3):
     """
     Do common in a sense of embeddings exist?
 
     Text is a string.
-    key_words is a set.
+    keywords is a set.
     without is a set.
     """
 
     t = Sentence(text)
     emb.embed(t)
 
-    k = Sentence(" ".join(list(key_words)))
+    k = Sentence(" ".join(list(keywords)))
     emb.embed(k)
 
     if len(without):
@@ -87,18 +87,20 @@ def complex_crit(text, key_words, without=set(), at_least=1, at_most=1, threshol
     return False
 # ------------------------------------- #
 
+
+
 # ---------- Simple criterion --------- #
-def simple_crit(text, key_words, without=set(), at_least=1, at_most=1):
+def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
     """
-    Do common words exist in key_words and text?
+    Do common words exist in keywords and text?
 
     Text is a string.
-    key_words is a set.
+    keywords is a set.
     without is a set.
     """
     splitted = set(text.split())
 
-    at_least_words = splitted.intersection(set(key_words))
+    at_least_words = splitted.intersection(set(keywords))
 
     if len(at_least_words) > (at_least-1):
         if bool(without):
@@ -109,8 +111,11 @@ def simple_crit(text, key_words, without=set(), at_least=1, at_most=1):
     else: return False
 # ------------------------------------- #
 
+
+
+# ----------  Parse function  --------- #
 @app.task
-def parse(path, key_words=set(), without=set(), at_least=1, at_most=1, crit="simple"):
+def parse(path):
     pdf_text_list=[]
     with open(path, 'rb') as pdf_file:
         read_pdf = PyPDF2.PdfFileReader(pdf_file)
@@ -121,12 +126,25 @@ def parse(path, key_words=set(), without=set(), at_least=1, at_most=1, crit="sim
             page_content = page.extractText()
             pdf_text_list.append(page_content)
         pdf_file.close()
-    if bool(key_words):
-        return pdf_text_list
-    else:
-        crit = simple_crit if crit == "simple" else complex_crit
-        return [t for t in pdf_text_list if crit(t, key_words, without=without, at_least=at_least, at_most=at_most)]
 
+    pdf_text = " ".join(pdf_text_list)
+    return pdf_text
+# ------------------------------------- #
+
+
+
+
+# ----------  Check function  --------- #
+@app.task
+def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple")
+    crit = simple_crit if crit == "simple" else complex_crit
+    return crit(pdf_text, keywords, without=without, at_least=at_least, at_most=at_most)
+# ------------------------------------- #
+
+
+
+# ----------  link processing --------- #
 @app.task
 def process_pdf_link(http_url):
     print(f"Received pdf: {http_url}")
+# ------------------------------------- #
