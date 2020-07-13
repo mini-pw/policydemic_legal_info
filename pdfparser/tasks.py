@@ -136,7 +136,7 @@ def parse(path):
 
 # ----------  Check function  --------- #
 @app.task
-def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple")
+def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple"):
     crit = simple_crit if crit == "simple" else complex_crit
     return crit(pdf_text, keywords, without=without, at_least=at_least, at_most=at_most)
 # ------------------------------------- #
