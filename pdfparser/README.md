@@ -68,6 +68,13 @@ Return:
 
 "check" task works as an endpoint. It takes a text of a pdf as a string and returns a boolean answer. It return True if the text fulfils the criterion. There is a simple criterion (crit = "simple") and complex criterion (crit = "complex"). Please notice, that the complex criterion is much slower.
 
+Examples:
+
+```python
+> check("We're all mad here.", keywords={'mad'}, without=set(), at_least=1, at_most=1, crit="simple")
+True
+```
+
 ### Simple Criterion Function
 
 ```python
@@ -86,6 +93,16 @@ Return:
 
 "simple_crit" checks if the intersection of set of words in the text and keywords set has at least "at_least" elements. If it has more than "at_most" words from the "without" set, it returns False.
 
+Example:
+```python
+> simple_crit("Curiouser and curiouser!", {"curious"}, without=set(), at_least=1, at_most=1)
+False
+
+> simple_crit("Curiouser and curiouser!", {"curiouser"}, without=set(), at_least=1, at_most=1)
+True
+```
+
+Note: Simple criterion is immune to uppercase/lowercase letters and punctuation marks.
 
 ### Complex Criterion Function
 
