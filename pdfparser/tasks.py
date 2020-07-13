@@ -4,9 +4,12 @@ import collections
 
 from scheduler.celery import app
 
+# --- required for ocr --- #
 import pytesseract
+import io
 from PIL import Image
 from wand.image import Image as wi
+from .config import ConfigOcr
 
 # --- required for complex criterion --- #
 import flair
@@ -34,7 +37,7 @@ def pdfocr(path, lang='eng'):
         print('Path is empty')
         return
 
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe' #path to tesseract.exe
+    pytesseract.pytesseract.tesseract_cmd = ConfigOcr.path_to_tesseract
     pdf = wi(filename=path, resolution=300)
     pdfImage = pdf.convert('jpeg')
 
@@ -44,12 +47,12 @@ def pdfocr(path, lang='eng'):
         imgPage = wi(image=img)
         imageBlobs.append(imgPage.make_blob('jpeg'))
 
-    result_text = []
+    result_text = ""
 
     for imgBlob in imageBlobs:
         im = Image.open(io.BytesIO(imgBlob))
         text = pytesseract.image_to_string(im, lang=lang)
-        result_text.append(text)
+        result_text = result_text + text
 
     return result_text
 
