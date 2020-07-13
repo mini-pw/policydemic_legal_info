@@ -15,6 +15,8 @@ import torch
 import numpy as np
 import pandas
 from flair.data import Sentence
+
+emb = WordEmbeddings('glove')
 # -------------------------------------- #
 
 @app.task
@@ -54,7 +56,7 @@ def pdfocr(path, lang='eng'):
 # --------- Complex criterion --------- #
 def cos(u,v):
     return u @ v / u.norm() / v.norm()
-def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.3):
+def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.2):
     """
     Do common in a sense of embeddings exist?
 
@@ -73,18 +75,22 @@ def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold
         w = Sentence(" ".join(list(without)))
         emb.embed(w)
 
+    ret_without = True
+    ret_keywords = False
     for tt in t:
+        if bool(without):
+            for ww in w:
+                if cos(tt.embedding, ww.embedding) > threshold:
+                    at_most -= 1
+                if at_most == 0:
+                    ret_without = False
         for kk in k:
             if cos(tt.embedding, kk.embedding) > threshold:
                 at_least -= 1
             if at_least == 0:
-                return True
-            if bool(without):
-                if cos(tt.embedding, kk.embedding) > threshold:
-                    at_most -= 1
-                if at_most == 0:
-                    return False
-    return False
+                ret_keywords = True
+
+    return ret_without and ret_keywords
 # ------------------------------------- #
 
 
@@ -98,7 +104,14 @@ def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
     keywords is a set.
     without is a set.
     """
-    splitted = set(text.split())
+    keywords = {k.lower() for k in keywords}
+
+    lowered = text.lower()
+
+    for m in ['.', ',', ':', ';', '-', '(', ')', '[', ']', '!', '?', '/', '\\']:
+        lowered = lowered.replace(m, ' ')
+
+    splitted = set(lowered.split())
 
     at_least_words = splitted.intersection(set(keywords))
 
