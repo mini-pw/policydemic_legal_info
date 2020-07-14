@@ -179,6 +179,27 @@ class TestTasks(unittest.TestCase):
 
       self.assertEqual(parsed_text,expected_text)
 
+   def test_pdfocr_small_file(self):
+      recognized_text = pdfocr("small.pdf")
+      expected_text = "Here is a small document\n" \
+                      "Testing how\n" \
+                      "PDF Parser will work"
+      print(recognized_text)
+      print(expected_text)
+      self.assertEqual(recognized_text, expected_text)
+
+   def test_pdfocr_longer_file(self):
+      recognized_text = parse("longer.pdf")
+      expected_text="Here is a another document\n!"\
+      "Bigger this time!"\
+      "Testing how\n!"\
+      "PDF Parser will work on a bigger one!"\
+      "This document contains an image!"\
+      "And then\" " \
+      "There is another page\n"\
+      "!That should also be parsed!"
+
+      self.assertEqual(recognized_text,expected_text)
 
 if __name__ == '__main__':
    unittest.main()

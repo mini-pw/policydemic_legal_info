@@ -16,7 +16,7 @@ https://www.ghostscript.com/
 ### Tesseract
 Download nad install Tesseract
 https://github.com/tesseract-ocr/tessdoc/blob/master/Downloads.md
-In pdfocr function in task.py set path to tesseract.exe
+In pdfparser/config.py set path to tesseract. By default is r'/usr/bin/tesseract'.
 
 
 ## API
