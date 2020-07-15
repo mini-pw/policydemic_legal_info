@@ -4,9 +4,12 @@ import collections
 
 from scheduler.celery import app
 
+# --- required for ocr --- #
 import pytesseract
+import io
 from PIL import Image
 from wand.image import Image as wi
+from .config import ConfigOcr
 
 # --- required for complex criterion --- #
 import flair
@@ -15,6 +18,8 @@ import torch
 import numpy as np
 import pandas
 from flair.data import Sentence
+
+emb = WordEmbeddings('glove')
 # -------------------------------------- #
 
 @app.task
@@ -32,7 +37,7 @@ def pdfocr(path, lang='eng'):
         print('Path is empty')
         return
 
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe' #path to tesseract.exe
+    pytesseract.pytesseract.tesseract_cmd = ConfigOcr.path_to_tesseract
     pdf = wi(filename=path, resolution=300)
     pdfImage = pdf.convert('jpeg')
 
@@ -42,19 +47,19 @@ def pdfocr(path, lang='eng'):
         imgPage = wi(image=img)
         imageBlobs.append(imgPage.make_blob('jpeg'))
 
-    result_text = []
+    result_text = ""
 
     for imgBlob in imageBlobs:
         im = Image.open(io.BytesIO(imgBlob))
         text = pytesseract.image_to_string(im, lang=lang)
-        result_text.append(text)
+        result_text = result_text + text
 
     return result_text
 
 # --------- Complex criterion --------- #
 def cos(u,v):
     return u @ v / u.norm() / v.norm()
-def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.3):
+def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.2):
     """
     Do common in a sense of embeddings exist?
 
@@ -73,18 +78,22 @@ def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold
         w = Sentence(" ".join(list(without)))
         emb.embed(w)
 
+    ret_without = True
+    ret_keywords = False
     for tt in t:
+        if bool(without):
+            for ww in w:
+                if cos(tt.embedding, ww.embedding) > threshold:
+                    at_most -= 1
+                if at_most == 0:
+                    ret_without = False
         for kk in k:
             if cos(tt.embedding, kk.embedding) > threshold:
                 at_least -= 1
             if at_least == 0:
-                return True
-            if bool(without):
-                if cos(tt.embedding, kk.embedding) > threshold:
-                    at_most -= 1
-                if at_most == 0:
-                    return False
-    return False
+                ret_keywords = True
+
+    return ret_without and ret_keywords
 # ------------------------------------- #
 
 
@@ -98,7 +107,14 @@ def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
     keywords is a set.
     without is a set.
     """
-    splitted = set(text.split())
+    keywords = {k.lower() for k in keywords}
+
+    lowered = text.lower()
+
+    for m in ['.', ',', ':', ';', '-', '(', ')', '[', ']', '!', '?', '/', '\\']:
+        lowered = lowered.replace(m, ' ')
+
+    splitted = set(lowered.split())
 
     at_least_words = splitted.intersection(set(keywords))
 
@@ -136,7 +152,7 @@ def parse(path):
 
 # ----------  Check function  --------- #
 @app.task
-def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple")
+def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple"):
     crit = simple_crit if crit == "simple" else complex_crit
     return crit(pdf_text, keywords, without=without, at_least=at_least, at_most=at_most)
 # ------------------------------------- #
