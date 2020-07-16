@@ -9,7 +9,7 @@ pip install wand
 ```
 ### ImageMagick
 Download and install ImageMagick
-http://docs.wand-py.org/en/latest/guide/install.html#install-imagemagick-on-windows
+http://docs.wand-py.org/en/latest/guide/install.html
 ### ghostscript
 Download and install ghostscript
 https://www.ghostscript.com/
@@ -38,15 +38,16 @@ Return:
 ### pdfocr Function
 
 ```python
-> pdfocr(path, lang='eng')
+> pdfocr(path, pages=[], lang='eng')
 ```
 
 Arguments:
 * path - STRING - a path to a .pdf file;
+* pages - LIST<INT> - number of pages to recognize, empty if whole document
 * lang - STRING - language, english by default.
 
 Return:
-* STRING - the text of the chosen .pdf
+* LIST<STRING> - list of the text of the chosen .pdf pages
 
 The function returns parsed text from pdf file using OCR (optical character recognition). It takes a path of a pdf file as an argument and returns its text as a STRING.
 
