@@ -1,3 +1,9 @@
+import json
+from nlpengine.tasks import index_document
+import requests
+import csv
+import codecs
+
 #URL containing Coronavirus Government Response Tracker csv file
 URL = 'https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv'
 
@@ -29,12 +35,25 @@ def createCgrtRecord(row, country, dateFrom, dateTo):
         return CgrtRecord(row[0], row[2], row)
     else:
         return None
-    
-#converting CgrtRecord instance to DB INPUT
-def convertToDatabaseRecords(records):
-    dataBaseRecords = []    
-    #TODO specify the DB INPUT
-    for r in records:
-        dataBaseRecords.append(None)
+
+#function downloading csv info with specified criteria
+def downloadCgrtRecords(country, dateFrom, dateTo):
+    #list of records from csv file
+    records = []
+    #read the csv file from url
+    r = requests.get(URL, stream=True)
+    reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'), delimiter=',')
+    for row in reader:
+        #convert row from csv to class record
+        record = createCgrtRecord(row, country, dateFrom, dateTo)
+        if record is None:
+            continue
+        records.append(record)
         
-    return dataBaseRecords
+    return records
+
+#send downloaded records to nlp engine
+def saveIntoDatabase(records):
+    for rec in records:
+        jsonString = json.dumps(rec.Data)
+        index_document(jsonString)
