@@ -53,18 +53,22 @@ The function returns parsed text from pdf file using OCR (optical character reco
 ### Check Function
 
 ```python
-> check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple")
+> check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, similarity="hamming", threshold=5, crit="simple")
 ```
 Arguments:
-* pdf_text - STRING - the text of the .pdf document;
+* text - STRING - the text of the .pdf document;
 * keywords - SET of STRING - a python set of words, that should be in the text;
 * without - SET of STRING - a python set of words, that shouldn't be in the text;
 * at_least - INT - an integer indicating, how many unique words from of the keywords set should at least be in the text. If the number of words is smaller, function returns False;
 * at_most - INT - an integer indicating, how many of the keywords should at most be in the text. If the number is bigger, function returns False;
-* crit - "simple" or "complex" - which criterion to choose.
+
+* threshold - FLOAT - threshold for similarity. The smaller the more words the algorithm accepts as similar.
+* similarity - textdistance algorithm or embedding_cosine - similarity algorithm. It can be from the textdistance package or embedding_cosine algorithm.
 
 Return:
-* BOOL - True if the text fulfils the criterion, i.e. if it has at least "at_least" words from the keywords set and at most "at_most" words from the without set.
+* BOOL - True if the text fulfils the criterion.
+
+check is a bridge to simple_crit and complex_crit function. For details please check their documentation.
 
 "check" task works as an endpoint. It takes a text of a .pdf as a string and returns a boolean answer. It return True if the text fulfils the criterion. There is a simple criterion (crit = "simple") and complex criterion (crit = "complex"). Please notice, that the complex criterion is much slower.
 
@@ -116,9 +120,8 @@ Arguments:
 * without - SET of STRING - a python set of words, that shouldn't be in the text;
 * at_least - INT - an integer indicating, how many unique words from of the keywords set should at least be in the text. If the number of words is smaller, function returns False;
 * at_most - INT - an integer indicating, how many of the keywords should at most be in the text. If the number is bigger, function returns False;
-
-* threshold - FLOAT - threshold for cosine distance. The smaller the more words the algorithm accepts as similar. Can be in range [-1,1].
-* similarity - textdistance algorithm or embedding_cosine - similarity algorithm. It can be from the textdistance package or embedding_cosine algorithm.
+* threshold - FLOAT - threshold for similarity. The smaller the more words the algorithm accepts as similar.
+* similarity - textdistance algorithm or embedding_cosine - similarity algorithm. It can be from the textdistance package (e.g. textdistance.hamming.similarity) or embedding_cosine similarity. It can also be a string, one of: "hamming", "embedding_cosine", "levenshtein".
 
 Return:
 * BOOL - True if the text fulfils the criterion.
