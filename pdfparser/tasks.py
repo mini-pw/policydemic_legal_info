@@ -283,10 +283,6 @@ def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, simila
         return complex_crit(pdf_text, keywords, without=without, at_least=at_least, at_most=at_most, similarity=similarity, threshold=threshold)
 # ------------------------------------- #
 
-
-
-
-
 # ----------  link processing --------- #
 @app.task
 def process_pdf_link(http_url):
