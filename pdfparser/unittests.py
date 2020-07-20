@@ -181,25 +181,28 @@ class TestTasks(unittest.TestCase):
 
    def test_pdfocr_small_file(self):
       recognized_text = pdfocr("small.pdf")
-      expected_text = "Here is a small document\n" \
+      expected_text = ["Here is a small document\n" \
                       "Testing how\n" \
-                      "PDF Parser will work"
-      print(recognized_text)
-      print(expected_text)
+                      "PDF Parser will work"]
+
       self.assertEqual(recognized_text, expected_text)
 
-   def test_pdfocr_longer_file(self):
-      recognized_text = parse("longer.pdf")
-      expected_text="Here is a another document\n!"\
-      "Bigger this time!"\
-      "Testing how\n!"\
-      "PDF Parser will work on a bigger one!"\
-      "This document contains an image!"\
-      "And then\" " \
-      "There is another page\n"\
-      "!That should also be parsed!"
+   def test_pdfocr_easy_page_ocrtest_file(self):
+      recognized_text = pdfocr("ocrtest.pdf", pages=[1])
+      expected_text = ["This is another sample document.\n"\
+                        "The first page is quality.\n"\
+                        "\nSample random text."]
 
       self.assertEqual(recognized_text,expected_text)
+
+   def test_pdfocr_hard_pages_ocrtest_file(self):
+      recognized_text = pdfocr("ocrtest.pdf", pages=[2,3])
+      expected_text = ["The second page contains a photo of the text.\n\n"\
+                        "This is text in paint.\n"\
+                        "Only ocr can read this."\
+                        ,"The last page contains\n"\
+                        "only text in paint."]
+      self.assertEqual(recognized_text, expected_text)
 
 if __name__ == '__main__':
    unittest.main()
