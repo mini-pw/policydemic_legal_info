@@ -19,10 +19,6 @@ from flair.data import Sentence
 emb = WordEmbeddings('glove')
 # -------------------------------------- #
 
-@app.task
-def pdfparser():
-    print("Hello queue world!")
-
 '''
 Function return parsed text from pdf file using optical character recognition
 path = path to pdf file
