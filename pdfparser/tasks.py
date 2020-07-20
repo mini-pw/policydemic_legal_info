@@ -29,9 +29,10 @@ def pdfparser():
 '''
 Function return parsed text from pdf file using optical character recognition
 path = path to pdf file
+pages = pages to recognize
 '''
 @app.task
-def pdfocr(path, lang='eng'):
+def pdfocr(path, pages=[], lang='eng'):
 
     if len(path) == 0:
         print('Path is empty')
@@ -42,17 +43,20 @@ def pdfocr(path, lang='eng'):
     pdfImage = pdf.convert('jpeg')
 
     imageBlobs = []
+    count = 1
 
     for img in pdfImage.sequence:
-        imgPage = wi(image=img)
-        imageBlobs.append(imgPage.make_blob('jpeg'))
+        if (not pages) or count in pages:
+            imgPage = wi(image=img)
+            imageBlobs.append(imgPage.make_blob('jpeg'))
+        count = count + 1
 
-    result_text = ""
+    result_text = []
 
     for imgBlob in imageBlobs:
         im = Image.open(io.BytesIO(imgBlob))
         text = pytesseract.image_to_string(im, lang=lang)
-        result_text = result_text + text
+        result_text.append(text)
 
     return result_text
 
