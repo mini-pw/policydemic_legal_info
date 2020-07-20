@@ -1,7 +1,6 @@
 import unittest
 import requests
-import csv
-import CGRT
+from crawler.cgrt import CGRT
 
 class CgrtTest(unittest.TestCase):
     #check if the link is correct and the response is ok

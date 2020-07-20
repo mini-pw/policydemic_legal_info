@@ -4,7 +4,7 @@ from scrapy.exceptions import DropItem
 from scrapy.pipelines.files import FilesPipeline
 
 from crawler.gov.gov.items import PdfItem
-from pdfparser.tasks import process_pdf_link
+from nlpengine.tasks import process_pdf_link
 
 
 class RenamePdfFilesPipeline(FilesPipeline):

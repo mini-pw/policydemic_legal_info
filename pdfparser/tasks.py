@@ -160,11 +160,3 @@ def check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="
     crit = simple_crit if crit == "simple" else complex_crit
     return crit(pdf_text, keywords, without=without, at_least=at_least, at_most=at_most)
 # ------------------------------------- #
-
-
-
-# ----------  link processing --------- #
-@app.task
-def process_pdf_link(http_url):
-    print(f"Received pdf: {http_url}")
-# ------------------------------------- #
