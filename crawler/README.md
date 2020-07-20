@@ -11,5 +11,7 @@ Link is classified as pdf whenever it contains `application/pdf` in response hea
 The crawling process may last several hours using fixed search depth set to 100.
 To visit even more websites, increase the value of `DEPTH_LIMIT` in `crawler.gov.gov.settings.py`
 
+Crawler module have also method `downloadCgrtData`, which gets the data from Coronavirus Government Response Tracker. The data is gathered in csv file, which contains significant number information about COVID-19.
+
 ## Future work
 A possible extension of the scope of these crawlers may be too adjust them to documents which can be found starting from this url: https://www.dziennikiurzedowe.gov.pl/. 

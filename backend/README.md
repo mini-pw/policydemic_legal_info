@@ -53,4 +53,65 @@ Response from server has following structure
 
 ### Tests
 
-In order to run tests just use jest framework. All of the tests are placed in `index.test.js` file
+In order to run tests just run `yarn test` inside this directory.
+
+
+### Further development
+
+In order to receive more data, one just need to edit function `parseData`. The received object from elastic looks as follows 
+
+```json
+            {
+                "_index": "documents",
+                "_type": "_doc",
+                "_id": "2RSKNHMBV-g9zj7jA9CQ",
+                "_score": 1,
+                "_source": {
+                    "web_page": "test_webpage.gov.pl",
+                    "document_type": "secondary",
+                    "pdf_path": "test_path",
+                    "scrap_date": "2020-10-05 10:00:00",
+                    "info_date": "2020-12-15",
+                    "country": "Poland",
+                    "language": "Polish",
+                    "translation_type": "automatic",
+                    "text_parsing_type": "ocr",
+                    "keywords": [
+                        "poland",
+                        "covid",
+                        "pandemia"
+                    ],
+                    "original_text": "Oryginalny tekst dokumentu",
+                    "translated_text": "Original text of the document",
+                    "organization": "Test2",
+                    "section": null
+                }
+```
+
+and it is parsed by function `parseData` mentioned above to following form required by frontend TableView
+
+```javascript
+function parseData(data){
+    const parsedData = [];
+    data.forEach(element => {
+        parsedData.push({
+            id: element._id,
+            source: element._source.organization,
+            infoDate: element._source.info_date,
+            language: element._source.language,
+            keywords: element._source.keywords,
+            country: element._source.country
+        })
+    });
+    return parsedData;
+}
+```
+
+### Setup local instance of ElasticSearch
+
+To setup local instance of ElasticSearch just execute this command
+
+```bash
+docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+```
+Elastic will be available under `localhost:9200`
