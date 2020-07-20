@@ -1,5 +1,6 @@
 import unittest
-from tasks import *
+from pdfparser.tasks import *
+
 
 class TestTasks(unittest.TestCase):
    def test_simple_crit(self):
@@ -250,5 +251,26 @@ class TestTasks(unittest.TestCase):
          False
       )
 
-if __name__ == 'main':
+   def test_parser_small_file(self):
+      parsed_text = parse("pdfparser/small.pdf")
+      expected_text="Here is a small document\n!"\
+      "Testing how\n!"\
+      "PDF Parser will work"
+      self.assertEqual(parsed_text,expected_text)
+
+   def test_parser_longer_file(self):
+      parsed_text = parse("pdfparser/longer.pdf")
+      expected_text="Here is a another document\n!"\
+      "Bigger this time!"\
+      "Testing how\n!"\
+      "PDF Parser will work on a bigger one!"\
+      "This document contains an image!"\
+      "And then\" " \
+      "There is another page\n"\
+      "!That should also be parsed!"
+
+      self.assertEqual(parsed_text,expected_text)
+
+
+if __name__ == '__main__':
    unittest.main()
