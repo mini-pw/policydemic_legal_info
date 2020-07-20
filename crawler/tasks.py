@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 
+import requests
 from crawler.cgrt import CGRT
 from billiard.context import Process
 from scrapy import signals
@@ -9,6 +10,7 @@ from scrapy.crawler import Crawler
 from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
+from crawler import CGRT
 from crawler.gov.gov.spiders.gov import GovDuSpider, GovCrawler, GovMpSpider
 from scheduler.celery import app
 
