@@ -22,3 +22,15 @@ Instructions on how to setup an instance of this service can be found in IBM Clo
 
 It is also required to supply credentials for the service, as described in ***https://pypi.org/project/ibm-watson/#authentication***
 The "Credential file" method should be used.
+
+##Other possible translators
+There are some other solutions for translating text. They differ between each other in usage, price and number of 
+characters that can be translated for free each month. Here are links to some of them:
+
+google: https://cloud.google.com/translate/
+
+yandex: https://tech.yandex.com/translate/ 
+
+microsoft: https://azure.microsoft.com/en-us/services/cognitive-services/translator/
+
+systran: https://platform.systran.net/reference/translation/
