@@ -39,3 +39,4 @@ class PolicyWatchSpider(scrapy.Spider):
             'organization': SITE_NAME
         }
         yield entry
+        
