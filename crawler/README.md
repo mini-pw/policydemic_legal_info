@@ -13,6 +13,8 @@ To visit even more websites, increase the value of `DEPTH_LIMIT` in `crawler.gov
 
 Crawler module have also method `downloadCgrtData`, which gets the data from Coronavirus Government Response Tracker. The data is gathered in csv file, which contains significant number information about COVID-19.
 
+* `PolicyWatchSpider`  crawls  governments' responses to the pandemic from website  `covid19policywatch.org`.
+
 ## Deployment
 To start crawlers, simply import and start corresponding task:
 ```python
