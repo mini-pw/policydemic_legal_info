@@ -1,5 +1,74 @@
 from scheduler.celery import app
 from ibm_watson import LanguageTranslatorV3
+import requests
+import json
+
+
+@app.task
+def translate_all():
+    database_address = 'http://127.0.0.1:9200/'
+    query = {
+        "query": {
+            "bool": {
+                "must_not": [
+                    {"match": {"language": "English"}},
+                    {"exists": {"field": "translated_text"}}
+                ]
+            }
+        }
+    }
+    headers = {'content-type': 'application/json'}
+    counter = 0
+    are_all_translated = True
+
+    while True:
+        # get documents for translation from elasticsearch
+        response = requests.get(database_address + 'documents/_search', data=json.dumps(query), headers=headers)
+        if response.status_code != 200:
+            return {"message": "Couldn't retrieve documents from database.", "updated_documents_count": counter}
+        ccl = response.content.decode('utf-8')
+        parsed_response = json.loads(ccl)
+
+        if parsed_response['hits']['total']['value'] == 0:
+            break
+
+        for document in parsed_response['hits']['hits']:
+            text_to_translate = document['_source']['original_text']
+            # translate text
+            translation = translate(text_to_translate)
+            if translation["translation_type"] == "missing":
+                are_all_translated = False
+                continue
+
+            # update record in database
+            update_query = {
+                "script": {
+                    "source": """
+                        ctx._source.translation_type = params.type;
+                        ctx._source.language = params.language;
+                        ctx._source.translated_text = params.translated_text
+                    """,
+                    "lang": "painless",
+                    "params": {
+                        "type": translation["translation_type"],
+                        "language": translation["language"],
+                        "translated_text": translation["translated_text"]
+                    }
+                }
+            }
+            response = requests.post(database_address + 'documents/_update/' + document['_id'],
+                                     data=json.dumps(update_query),
+                                     headers=headers)
+
+            if response.status_code == 200:
+                counter += 1
+            else:
+                are_all_translated = False
+
+    if are_all_translated:
+        return {"message": "All documents have been translated.", "updated_documents_count": counter}
+    else:
+        return {"message": "Couldn't translate all of the documents.", "updated_documents_count": counter}
 
 
 @app.task
@@ -111,6 +180,7 @@ def translate(text):
         res = response.get_result()
         output = res['translations'][0]['translation']
         language_name = LT_PAIRS[language]
+        # print(output)
         return {
             'translation_type': 'auto',
             'original_text': text,
@@ -124,3 +194,4 @@ def translate(text):
             'translated_text': text,
             'language': LT_PAIRS[BASE_LANGUAGE]
         }
+
