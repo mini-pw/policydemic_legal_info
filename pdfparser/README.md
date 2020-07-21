@@ -28,10 +28,10 @@ In pdfparser/config.py set path to tesseract. By default is r'/usr/bin/tesseract
 ```
 
 Arguments:
-* path - STRING - a path to a .pdf file
+* path - STRING - a path to a single .pdf file;
 
 Return:
-* STRING - the text of the chosen .pdf
+* STRING - the text of the chosen .pdf;
 
 "parse" task works as an endpoint. It takes a path of a pdf file as an argument and returns its text as a STRING.
 
@@ -54,20 +54,24 @@ The function returns parsed text from pdf file using OCR (optical character reco
 ### Check Function
 
 ```python
-> check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, crit="simple")
+> check(pdf_text, keywords=set(), without=set(), at_least=1, at_most=1, similarity="hamming", threshold=5, crit="simple")
 ```
 Arguments:
-* pdf_text - STRING - the text of the .pdf document;
-* keywords - SET of STRING - a python set of keywords;
-* without - SET of STRING - a python set of words, that should not exist in pdf;
-* at_least - INT - how many of the keywords should at least be in the text;
-* at_most - INT - how many of the keywords should at most be in the text;
-* crit - "simple" or "complex" - which criterion to choose.
+* text - STRING - the text of the .pdf document;
+* keywords - SET of STRING - a python set of words, that should be in the text;
+* without - SET of STRING - a python set of words, that shouldn't be in the text;
+* at_least - INT - an integer indicating, how many unique words from of the keywords set should at least be in the text. If the number of words is smaller, function returns False;
+* at_most - INT - an integer indicating, how many of the keywords should at most be in the text. If the number is bigger, function returns False;
+
+* threshold - FLOAT - threshold for similarity. The smaller the more words the algorithm accepts as similar.
+* similarity - textdistance algorithm or embedding_cosine - similarity algorithm. It can be from the textdistance package or embedding_cosine algorithm.
 
 Return:
-* BOOL - True if the text fulfils the criterion
+* BOOL - True if the text fulfils the criterion.
 
-"check" task works as an endpoint. It takes a text of a pdf as a string and returns a boolean answer. It return True if the text fulfils the criterion. There is a simple criterion (crit = "simple") and complex criterion (crit = "complex"). Please notice, that the complex criterion is much slower.
+check is a bridge to simple_crit and complex_crit function. For details please check their documentation.
+
+"check" task works as an endpoint. It takes a text of a .pdf as a string and returns a boolean answer. It return True if the text fulfils the criterion. There is a simple criterion (crit = "simple") and complex criterion (crit = "complex"). Please notice, that the complex criterion is much slower.
 
 Examples:
 
@@ -84,22 +88,22 @@ simple_crit(text, keywords, without=set(), at_least=1, at_most=1)
 
 Arguments:
 * text - STRING - the text of the .pdf document;
-* keywords - SET of STRING - a python set of keywords;
-* without - SET of STRING - a python set of words, that should not exist in pdf;
-* at_least - INT - how many of the keywords should at least be in the text;
-* at_most - INT - how many of the keywords should at most be in the text;
+* keywords - SET of STRING - a python set of words, that should be in the text;
+* without - SET of STRING - a python set of words, that shouldn't be in the text;
+* at_least - INT - an integer indicating, how many unique words from of the keywords set should at least be in the text. If the number of words is smaller, function returns False;
+* at_most - INT - an integer indicating, how many of the keywords should at most be in the text. If the number is bigger, function returns False;
 
 Return:
-* BOOL - True if the text fulfils the criterion.
+* BOOL - True if the text fulfils the criterion, i.e. if it has at least "at_least" words from the keywords set and at most "at_most" words from the without set.
 
 "simple_crit" checks if the intersection of set of words in the text and keywords set has at least "at_least" elements. If it has more than "at_most" words from the "without" set, it returns False.
 
 Example:
 ```python
-> simple_crit("Curiouser and curiouser!", {"curious"}, without=set(), at_least=1, at_most=1)
+> simple_crit("Curiouser and curiouser!", {"curious"}, without=set(), at_least=1)
 False
 
-> simple_crit("Curiouser and curiouser!", {"curiouser"}, without=set(), at_least=1, at_most=1)
+> simple_crit("Curiouser and curiouser!", {"curiouser"}, without=set(), at_least=1)
 True
 ```
 
@@ -113,16 +117,23 @@ complex_crit(text, keywords, without=set(), at_least=1, at_most=1, threshold=0.3
 
 Arguments:
 * text - STRING - the text of the .pdf document;
-* keywords - SET of STRING - a python set of keywords;
-* without - SET of STRING - a python set of words, that should not exist in pdf;
-* at_least - INT - how many of the keywords should at least be in the text;
-* at_most - INT - how many of the keywords should at most be in the text;
-* threshold - FLOAT - threshold for cosine distance. The smaller the more words the algorithm accepts as similar. Can be in range [-1,1].
+* keywords - SET of STRING - a python set of words, that should be in the text;
+* without - SET of STRING - a python set of words, that shouldn't be in the text;
+* at_least - INT - an integer indicating, how many unique words from of the keywords set should at least be in the text. If the number of words is smaller, function returns False;
+* at_most - INT - an integer indicating, how many of the keywords should at most be in the text. If the number is bigger, function returns False;
+* threshold - FLOAT - threshold for similarity. The smaller the more words the algorithm accepts as similar.
+* similarity - textdistance algorithm or embedding_cosine - similarity algorithm. It can be from the textdistance package (e.g. textdistance.hamming.similarity) or embedding_cosine similarity. It can also be a string, one of: "hamming", "embedding_cosine", "levenshtein".
 
 Return:
 * BOOL - True if the text fulfils the criterion.
 
-"complex_crit" checks if the intersection of set of words in the text and keywords set has at least "at_least" elements. If it has more than "at_most" words from the "without" set, it returns False. However, the equivalency of two words is computed as follows: two words A and B get transformed into their embeddings, cosine is computed between those embeddings and if it is greater than "threshold", two words are equivalent.
+"complex_crit" checks if the intersection of set of words in the text and keywords set has at least "at_least" elements. If it has more than "at_most" words from the "without" set, it returns False. However, we say that two words A and B are equivalent when their similarity is above "threshold". Similarity is any function, that takes two strings and returns real number, that expresses similarity between those words. There are several distances to choose from, including:
+* Embedding cosine similarity: two words A and B get transformed into their embeddings, cosine is computed between those embeddings and if it is greater than "threshold", two words are equivalent.
+* Hamming similarity: https://en.wikipedia.org/wiki/Hamming_distance
+* Levenshtein similarity: https://en.wikipedia.org/wiki/Levenshtein_distance
+
+and others from the textdistance package: https://pypi.org/project/textdistance/.
+
 
 Example:
 ```python
