@@ -2,8 +2,9 @@ from scheduler.celery import app
 from elasticsearch import Elasticsearch
 from configparser import ConfigParser
 
+
 config = ConfigParser()
-config.read('config.ini')
+config.read('nlpengine/config.ini')
 
 es_hosts = config['elasticsearch']['hosts']
 es = Elasticsearch(hosts=es_hosts)
