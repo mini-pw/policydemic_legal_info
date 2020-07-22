@@ -11,6 +11,7 @@ from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
 from crawler.gov.gov.spiders.gov import GovDuSpider, GovCrawler, GovMpSpider
+from crawler.COVIDPolicyWatch.PolicyWatchSpider import PolicyWatchSpider
 from scheduler.celery import app
 
 
@@ -98,3 +99,12 @@ def downloadCgrtData(country, dateFrom, dateTo):
 
     #send downloaded data to nlp engine
     return CGRT.saveIntoDatabase(records)
+
+@app.task
+def crawl_policy_watch():
+    """ Starts crawling process which fetches government policies from website covid19policywatch.org"""
+    os.environ['SCRAPY_SETTINGS_MODULE'] = 'crawler.COVIDPolicyWatch.settings'
+    spider = PolicyWatchSpider()
+    process = CrawlerProcess(spider)
+    process.start()
+    process.join()

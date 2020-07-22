@@ -32,6 +32,8 @@ The parameters of `downloadCgrtData` function are the name of the country (in En
 Crawler module contains `downloadPdf` function which downloads PDF file using specified URL. The parameters of the function are URL string, directory path (if does not exists, it will be created), name of downloaded PDF file and the size of the batch used in downloading in case of big files. Three last parameters have default values.
 Function checks if the file under the URL have `application/pdf` value under key `content-type`, otherwise the file will not be downloaded.
 
+* `PolicyWatchSpider`  crawls  governments' responses to the pandemic from website  `covid19policywatch.org`.
+
 ## Deployment
 To start crawlers, simply import and start corresponding task:
 ```python
