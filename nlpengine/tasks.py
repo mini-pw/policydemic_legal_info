@@ -48,7 +48,6 @@ def download_pdf(pdf_url):
         "filename": pdf_filename
     })
 
-    # print(f"PDF URL: {pdf_url}, PDF path: {pdf_path}")
     return {
         "web_page": pdf_url,
         "pdf_path": pdf_path
