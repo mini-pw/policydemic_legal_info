@@ -55,5 +55,7 @@ def downloadCgrtRecords(country, dateFrom, dateTo):
 #send downloaded records to nlp engine
 def saveIntoDatabase(records):
     for rec in records:
+        rec.Data["Country"] = rec.Country
+        rec.Data["Date"] = rec.Date
         jsonString = json.dumps(rec.Data)
         index_document(jsonString)
