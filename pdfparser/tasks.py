@@ -37,6 +37,23 @@ pages = pages to recognize
 '''
 @app.task
 def pdfocr(path, pages=[], lang='eng'):
+    """
+    ### pdfocr Function
+
+    ```python
+    > pdfocr(path, pages=[], lang='eng')
+    ```
+
+    Arguments:
+    * path - STRING - a path to a .pdf file;
+    * pages - LIST<INT> - number of pages to recognize, empty if whole document
+    * lang - STRING - language, english by default.
+
+    Return:
+    * LIST<STRING> - list of the text of the chosen .pdf pages
+
+    The function returns parsed text from pdf file using OCR (optical character recognition). It takes a path of a pdf file as an argument and returns its text as a STRING.
+    """
 
     if len(path) == 0:
         print('Path is empty')
@@ -216,31 +233,27 @@ def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
 @app.task
 def parse(path):
     """
-       parse
+    parse
 
-       Arguments:
-       * path - STRING - a path to a single .pdf file;
+    Arguments:
+    * path - STRING - a path to a single .pdf file;
 
-       Return:
-       * STRING - the text of the chosen .pdf;
+    Return:
+    * pdf_metadata, separated_text, empty_pages, all_text - TUPLE, where:
+        * pdf_metadata - DICT containing metadata extracted from the parsed file. Contains the author, creator,
+            producer, subject and title of the file in the respective keys in the dictionary.
+        * separated_text - LIST of LISTS containing the text in the parsed file, separated into pages,
+            and every page separated into paragraphs (blocks of texts). In the separated_text list, each element
+            corresponds to one page of the document and each element of this element corresponds to one paragraph.
+        * empty_pages - LIST of pages in the parsed file which did not contain any text. The list shall be used to
+            run `pdfocr` function on the missing pages.
+        * all_text - STRING containing the entire text of the parsed PDF file.
 
-       "parse" task works as an endpoint. It takes a path of a pdf file as an argument and returns its text as a STRING.
+    "parse" task works as an endpoint. It takes a path of a pdf file as an argument and returns its metadata,
+    its text in STRING format, LIST of unparsed pages as well as LIST of LISTS of text separated into pages
+    and pages into paragraphs.
+    """
 
-       ### pdfocr Function
-
-       ```python
-       > pdfocr(path, lang='eng')
-       ```
-
-       Arguments:
-       * path - STRING - a path to a .pdf file;
-       * lang - STRING - language, english by default.
-
-       Return:
-       * STRING - the text of the chosen .pdf
-
-       The function returns parsed text from pdf file using OCR (optical character recognition). It takes a path of a pdf file as an argument and returns its text as a STRING.
-       """
     empty_pages = []
     separated_text = []
     all_text = ""
