@@ -1,10 +1,9 @@
-import codecs
-import csv
 import os
+import sys
 from pathlib import Path
 
-import CGRT
 import requests
+from crawler.cgrt import CGRT
 from billiard.context import Process
 from scrapy import signals
 from scrapy.crawler import Crawler
@@ -12,6 +11,7 @@ from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
 from crawler.gov.gov.spiders.gov import GovDuSpider, GovCrawler, GovMpSpider
+from crawler.COVIDPolicyWatch.PolicyWatchSpider import PolicyWatchSpider
 from scheduler.celery import app
 
 
@@ -94,17 +94,17 @@ date format is YYYYMMDD , for example "20200624"
 '''
 @app.task
 def downloadCgrtData(country, dateFrom, dateTo):
-    #list of records from csv file
-    records = []
-    #read the csv file from url
-    r = requests.get(CGRT.URL, stream=True)
-    reader = csv.reader(codecs.iterdecode(r.iter_lines(), 'utf-8'), delimiter=',')
-    for row in reader:
-        #convert row from csv to class record
-        record = CGRT.createCgrtRecord(row, country, dateFrom, dateTo)
-        if record is None:
-            continue
-        records.append(record)
+    #download records from Coronavirus Government Response Tracker
+    records = CGRT.downloadCgrtRecords(country, dateFrom, dateTo)
 
-    #convert downloaded records to DB INPUT
-    return CGRT.convertToDatabaseRecords(records)
+    #send downloaded data to nlp engine
+    return CGRT.saveIntoDatabase(records)
+
+@app.task
+def crawl_policy_watch():
+    """ Starts crawling process which fetches government policies from website covid19policywatch.org"""
+    os.environ['SCRAPY_SETTINGS_MODULE'] = 'crawler.COVIDPolicyWatch.settings'
+    spider = PolicyWatchSpider()
+    process = CrawlerProcess(spider)
+    process.start()
+    process.join()

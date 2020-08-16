@@ -1,11 +1,16 @@
 import scrapy
 import json
+from nlpengine.tasks import dispatch
 
 BASE_URL = 'https://covid19policywatch.org/'
 SITE_NAME = 'COVID-19 Policy Watch'
 
 class PolicyWatchSpider(scrapy.Spider):
+    """crawls government policies from website covid19policywatch.org"""
     name = 'policywatch'
+    custom_settings = {
+        'ITEM_PIPELINES':  { "crawler.COVIDPolicyWatch.PolicyWatchSpider.CreateInsertDocumentTaskPipeline" : 0} ,
+    }
     start_urls = [
         BASE_URL,
     ]
@@ -39,4 +44,14 @@ class PolicyWatchSpider(scrapy.Spider):
             'organization': SITE_NAME
         }
         yield entry
+
+
+
+
+class CreateInsertDocumentTaskPipeline:
+    """Pipeline creates  Celery task which inserts document into index"""
+    def process_item(self, item, spider):
+        json_item = json.dumps(item)
+        dispatch.delay(json_item)
+        return item
         
