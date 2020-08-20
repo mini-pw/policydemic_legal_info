@@ -251,23 +251,26 @@ class TestTasks(unittest.TestCase):
          False
       )
 
-   def test_parser_small_file(self):
-      parsed_text = parse("pdfparser/small.pdf")
-      expected_text="Here is a small document\n!"\
-      "Testing how\n!"\
-      "PDF Parser will work"
-      self.assertEqual(parsed_text,expected_text)
+   def test_parser_metadata(self):
+      metadata, _, _, _ = parse("pdfparser/rozp.pdf")
+      self.assertEqual(metadata["title"],
+                       "Ustawa z dnia 31 marca 2020 r. o zmianie niektórych ustaw w zakresie systemu " \
+                       "ochrony zdrowia związanych z zapobieganiem, przeciwdziałaniem i zwalczaniem COVID-19")
+      self.assertEqual(metadata["author"], "RCL")
+      self.assertEqual(metadata["creator"], "Microsoft® Word 2010")
+      self.assertEqual(metadata["producer"], "Microsoft® Word 2010; modified using iText 2.1.7 by 1T3XT")
 
-   def test_parser_longer_file(self):
-      parsed_text = parse("pdfparser/longer.pdf")
-      expected_text="Here is a another document\n!"\
-      "Bigger this time!"\
-      "Testing how\n!"\
-      "PDF Parser will work on a bigger one!"\
-      "This document contains an image!"\
-      "And then\" " \
-      "There is another page\n"\
-      "!That should also be parsed!"
+   def test_parser_separated_text(self):
+      _, separated_text, _, _ = parse("pdfparser/3_pages.pdf")
+      self.assertEqual(separated_text, [['PDF with 3 pages\u2028\nText on the ﬁrst one\u2029\n'], [],
+                                        ['Text on the 3rd one\n']])
+
+   def test_parser_empty_pages(self):
+      _, _, empty_pages, _ = parse("pdfparser/3_pages.pdf")
+      self.assertEqual(empty_pages, [1])
+
+   def test_parser_all_text(self):
+      _, _, _, all_text = parse("pdfparser/small.pdf")
 
       self.assertEqual(parsed_text,expected_text)
 

@@ -1,4 +1,10 @@
 import PyPDF2
+from pdfminer.layout import LAParams
+from pdfminer.pdfinterp import PDFResourceManager
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.pdfpage import PDFPage
+from pdfminer.layout import LTTextBoxHorizontal
 
 import collections
 
@@ -31,6 +37,23 @@ pages = pages to recognize
 '''
 @app.task
 def pdfocr(path, pages=[], lang='eng'):
+    """
+    ### pdfocr Function
+
+    ```python
+    > pdfocr(path, pages=[], lang='eng')
+    ```
+
+    Arguments:
+    * path - STRING - a path to a .pdf file;
+    * pages - LIST<INT> - number of pages to recognize, empty if whole document
+    * lang - STRING - language, english by default.
+
+    Return:
+    * LIST<STRING> - list of the text of the chosen .pdf pages
+
+    The function returns parsed text from pdf file using OCR (optical character recognition). It takes a path of a pdf file as an argument and returns its text as a STRING.
+    """
 
     if len(path) == 0:
         print('Path is empty')
@@ -156,7 +179,6 @@ def complex_crit(text, keywords, without=set(), at_least=1, at_most=1, similarit
 # ------------------------------------- #
 
 
-
 # ---------- Simple criterion --------- #
 def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
     """
@@ -207,7 +229,6 @@ def simple_crit(text, keywords, without=set(), at_least=1, at_most=1):
 # ------------------------------------- #
 
 
-
 # ----------  Parse function  --------- #
 @app.task
 def parse(path):
@@ -218,38 +239,54 @@ def parse(path):
     * path - STRING - a path to a single .pdf file;
 
     Return:
-    * STRING - the text of the chosen .pdf;
+    * pdf_metadata, separated_text, empty_pages, all_text - TUPLE, where:
+        * pdf_metadata - DICT containing metadata extracted from the parsed file. Contains the author, creator,
+            producer, subject and title of the file in the respective keys in the dictionary.
+        * separated_text - LIST of LISTS containing the text in the parsed file, separated into pages,
+            and every page separated into paragraphs (blocks of texts). In the separated_text list, each element
+            corresponds to one page of the document and each element of this element corresponds to one paragraph.
+        * empty_pages - LIST of pages in the parsed file which did not contain any text. The list shall be used to
+            run `pdfocr` function on the missing pages.
+        * all_text - STRING containing the entire text of the parsed PDF file.
 
-    "parse" task works as an endpoint. It takes a path of a pdf file as an argument and returns its text as a STRING.
-
-    ### pdfocr Function
-
-    ```python
-    > pdfocr(path, lang='eng')
-    ```
-
-    Arguments:
-    * path - STRING - a path to a .pdf file;
-    * lang - STRING - language, english by default.
-
-    Return:
-    * STRING - the text of the chosen .pdf
-
-    The function returns parsed text from pdf file using OCR (optical character recognition). It takes a path of a pdf file as an argument and returns its text as a STRING.
+    "parse" task works as an endpoint. It takes a path of a pdf file as an argument and returns its metadata,
+    its text in STRING format, LIST of unparsed pages as well as LIST of LISTS of text separated into pages
+    and pages into paragraphs.
     """
-    pdf_text_list=[]
-    with open(path, 'rb') as pdf_file:
-        read_pdf = PyPDF2.PdfFileReader(pdf_file)
-        number_of_pages = read_pdf.getNumPages()
-        c = collections.Counter(range(number_of_pages))
-        for i in c:
-            page = read_pdf.getPage(i)
-            page_content = page.extractText()
-            pdf_text_list.append(page_content)
-        pdf_file.close()
 
-    pdf_text = " ".join(pdf_text_list)
-    return pdf_text
+    empty_pages = []
+    separated_text = []
+    all_text = ""
+    page_no = 0
+    document = open(path, 'rb')
+    pdf_info = PyPDF2.PdfFileReader(document).getDocumentInfo()
+    pdf_metadata = {
+        "author": pdf_info.author,
+        "creator": pdf_info.creator,
+        "producer": pdf_info.producer,
+        "subject": pdf_info.subject,
+        "title": pdf_info.title,
+    }
+    rsrcmgr = PDFResourceManager()
+    laparams = LAParams()
+    device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    for page in PDFPage.get_pages(document):
+        text_on_page = []
+        interpreter.process_page(page)
+        layout = device.get_result()
+        for element in layout:
+            if isinstance(element, LTTextBoxHorizontal):
+                text_on_page.append(element.get_text())
+                all_text+=element.get_text()
+        if len(text_on_page) == 0:
+            empty_pages.append(page_no)
+        separated_text.append(text_on_page)
+        page_no += 1
+    document.close()
+    return pdf_metadata, separated_text, empty_pages, all_text
+
+
 # ------------------------------------- #
 
 
